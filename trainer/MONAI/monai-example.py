@@ -1,5 +1,5 @@
 #!pip install -q "monai[gdown, nibabel, tqdm, itk]"
-
+import sys
 import os
 import numpy as np
 #%matplotlib inline
@@ -18,7 +18,18 @@ from monai.metrics import compute_roc_auc
 np.random.seed(0)
 print_config()
 
-data_dir = 'C:/Users/mhreh/research/MedNIST/'
+ProjecttDir = os.getcwd()
+sys.path.insert(1, ProjecttDir)
+
+datapath = '.\save\data'
+#datasetName = 'MedNIST'
+data_dir = os.path.join(datapath, 'MedNIST')
+print(data_dir)
+modelpath = '.\save\model'
+modelName = 'MONAI-test.pth.tar'
+modelFile = os.path.join(modelpath, modelName)
+
+#data_dir = 'C:/Users/mhreh/research/MedNIST/'
 class_names = sorted([x for x in os.listdir(data_dir) if os.path.isdir(os.path.join(data_dir, x))])
 num_class = len(class_names)
 image_files = [[os.path.join(data_dir, class_name, x) 
