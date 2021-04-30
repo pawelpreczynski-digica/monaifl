@@ -97,13 +97,13 @@ class MedNISTDataset(Dataset):
         return self.transforms(self.image_files[index]), self.labels[index]
 
 train_ds = MedNISTDataset(trainX, trainY, train_transforms)
-train_loader = DataLoader(train_ds, batch_size=64, shuffle=True, num_workers=10)
+train_loader = DataLoader(train_ds, batch_size=32, shuffle=True)
 
 val_ds = MedNISTDataset(valX, valY, val_transforms)
-val_loader = DataLoader(val_ds, batch_size=64, num_workers=10)
+val_loader = DataLoader(val_ds, batch_size=32)
 
 test_ds = MedNISTDataset(testX, testY, val_transforms)
-test_loader = DataLoader(test_ds, batch_size=64, num_workers=10)
+test_loader = DataLoader(test_ds, batch_size=32)
 
 device = torch.device("cuda:0")
 model = densenet121(
