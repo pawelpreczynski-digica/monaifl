@@ -11,7 +11,7 @@ from torch.utils.data import Dataset, DataLoader
 
 from monai.config import print_config
 from monai.transforms import \
-    Compose, LoadPNG, AddChannel, ScaleIntensity, ToTensor, RandRotate, RandFlip, RandZoom
+    Compose, LoadImage, AddChannel, ScaleIntensity, ToTensor, RandRotate, RandFlip, RandZoom
 from monai.networks.nets import densenet121
 from monai.metrics import compute_roc_auc
 
@@ -21,7 +21,8 @@ print_config()
 ProjecttDir = os.getcwd()
 sys.path.insert(1, ProjecttDir)
 
-datapath = '.\save\data'
+
+datapath= 'trainer/MONAI/save/data'
 #datasetName = 'MedNIST'
 data_dir = os.path.join(datapath, 'MedNIST')
 print(data_dir)
@@ -78,7 +79,7 @@ for i in range(num_total):
 print("Training count =",len(trainX),"Validation count =", len(valX), "Test count =",len(testX))
 
 train_transforms = Compose([
-    LoadPNG(image_only=True),
+    LoadImage(image_only=True),
     AddChannel(),
     ScaleIntensity(),
     RandRotate(range_x=15, prob=0.5, keep_size=True),
@@ -88,7 +89,7 @@ train_transforms = Compose([
 ])
 
 val_transforms = Compose([
-    LoadPNG(image_only=True),
+    LoadImage(image_only=True),
     AddChannel(),
     ScaleIntensity(),
     ToTensor()
