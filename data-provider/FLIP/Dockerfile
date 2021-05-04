@@ -1,9 +1,7 @@
-FROM ubuntu
+FROM python
 
-RUN apt-get update
-RUN apt-get install python
+WORKDIR /data-provider/FLIP/Dockerfile
+COPY . .
 
-COPY . data-provider/FLIP/src
-
-CMD ["python", "/data-provider/FLIP/src/main.py"]
+CMD ["python", "src/data_provider.py"]
 

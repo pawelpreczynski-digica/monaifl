@@ -1,9 +1,7 @@
-FROM ubuntu
+FROM python
 
-RUN apt-get update
-RUN apt-get install python
+WORKDIR /data-provider/third-party-dataset/Dockerfile
+COPY . .
 
-COPY . data-provider/third-party-dataset/src
-
-CMD ["python", "/data-provider/third-party-dataset/src/main.py"]
+CMD ["python", "src/third_party_dataset.py"]
 

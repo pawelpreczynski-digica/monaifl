@@ -1,9 +1,8 @@
-FROM ubuntu
+FROM python
 
-RUN apt-get update
-RUN apt-get install python
+WORKDIR /aggregator/flprotocol/Dockerfile
 
-COPY . aggregator/flprotocol/src
+COPY . .
 
-CMD ["python", "/aggregator/flprotocol/src/main.py"]
+CMD ["python", "src/protocol.py"]
 

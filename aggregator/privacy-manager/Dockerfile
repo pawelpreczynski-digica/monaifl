@@ -1,9 +1,7 @@
-FROM ubuntu
+FROM python
 
-RUN apt-get update
-RUN apt-get install python
+WORKDIR /aggregator/privacy-manager/Dockerfile
+COPY . .
 
-COPY . aggregator/privacy-manager/src
-
-CMD ["python", "/aggregator/privacy-manager/src/main.py"]
+CMD ["python", "src/privacy_main.py"]
 

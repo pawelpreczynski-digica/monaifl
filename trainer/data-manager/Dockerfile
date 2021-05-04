@@ -1,9 +1,7 @@
-FROM ubuntu
+FROM python
 
-RUN apt-get update
-RUN apt-get install python
+WORKDIR /trainer/data-manager/Dockerfile
+COPY . .
 
-COPY . trainer/data-manager/src
-
-CMD ["python", "/trainer/data-manager/src/main.py"]
+CMD ["python", "src/data_manager.py"]
 

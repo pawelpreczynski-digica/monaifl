@@ -1,9 +1,7 @@
-FROM ubuntu
+FROM python
 
-RUN apt-get update
-RUN apt-get install python
+WORKDIR /data-provider/custom-dataset/Dockerfile
+COPY . .
 
-COPY . data-provider/custom-dataset/src
-
-CMD ["python", "/data-provider/custom-dataset/src/main.py"]
+CMD ["python", "src/custom_dataset.py"]
 

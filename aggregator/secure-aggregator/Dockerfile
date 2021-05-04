@@ -1,9 +1,7 @@
-FROM ubuntu
+FROM python
 
-RUN apt-get update
-RUN apt-get install python
+WORKDIR /aggregator/secure-aggregator/Dockerfile
+COPY . .
 
-COPY . aggregator/secure-aggregator/src
-
-CMD ["python", "aggregator/secure-aggregator/src/main.py"]
+CMD ["python", "src/main_aggregator.py"]
 
