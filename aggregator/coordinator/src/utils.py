@@ -2,7 +2,7 @@ import copy
 import numpy as np
 
 
-# This class is a utility class for creating, distributing.
+# This class is a utility class for creating, distributing the data points.
 class DataManager:
     def __init__(self, num_elements, num_chunks, max_num):
         self.arr = np.random.randint(0, max_num, num_elements)
