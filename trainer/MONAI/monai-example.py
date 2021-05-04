@@ -22,11 +22,12 @@ ProjecttDir = os.getcwd()
 sys.path.insert(1, ProjecttDir)
 
 
-datapath= 'trainer/MONAI/save/data'
-#datasetName = 'MedNIST'
-data_dir = os.path.join(datapath, 'MedNIST')
+datapath= 'trainer\MONAI\save\data'
+datasetName = 'MedNIST'
+data_dir = os.path.join(datapath, datasetName)
 print(data_dir)
-modelpath = '.\save\model'
+
+modelpath = 'trainer\MONAI\save\models'
 modelName = 'MONAI-test.pth.tar'
 modelFile = os.path.join(modelpath, modelName)
 
@@ -169,7 +170,7 @@ for epoch in range(epoch_num):
             if auc_metric > best_metric:
                 best_metric = auc_metric
                 best_metric_epoch = epoch + 1
-                torch.save(model.state_dict(), 'best_metric_model.pth')
+                torch.save(model.state_dict(), modelFile) #'best_metric_model.pth')
                 print('saved new best metric model')
             print(f"current epoch: {epoch + 1} current AUC: {auc_metric:.4f}"
                   f" current accuracy: {acc_metric:.4f} best AUC: {best_metric:.4f}"
