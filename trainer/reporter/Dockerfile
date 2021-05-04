@@ -1,9 +1,14 @@
-FROM ubuntu
+FROM python
 
-RUN apt-get update
-RUN apt-get install python
+WORKDIR /trainer/reporter/Dockerfile
 
-COPY . trainer/reporter/src
+RUN pip install flask
+RUN pip install --no-cache-dir numpy
+#RUN pip install copy
+RUN pip install requests
 
-CMD ["python", "/trainer/reporter/src/main.py"]
+COPY . .
 
+EXPOSE 5000
+
+CMD ["python", "src/reporter.py"]
