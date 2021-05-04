@@ -1,1 +1,7 @@
-# this docker profile will be provisioned by MONAI team
+FROM python
+
+WORKDIR /trainer/MONAI/Dockerfile
+
+COPY . .
+
+CMD ["python", "pipeline/monai_example.py"]
