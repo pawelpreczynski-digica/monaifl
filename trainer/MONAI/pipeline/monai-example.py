@@ -22,12 +22,12 @@ ProjecttDir = os.getcwd()
 sys.path.insert(1, ProjecttDir)
 
 
-datapath= 'save/data'
+datapath= 'trainer/MONAI/save/data'
 datasetName = 'MedNIST'
 data_dir = os.path.join(datapath, datasetName)
 print(data_dir)
 
-modelpath = 'save/models'
+modelpath = 'trainer/MONAI/save/models'
 modelName = 'MONAI-test.pth.tar'
 modelFile = os.path.join(modelpath, modelName)
 
