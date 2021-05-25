@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package protobufs;
+
+// Parameter Request
+message ParamsRequest {
+    bytes paraRequest = 1;
+}
+
+// Parameter Response
+message ParamsResponse {
+    bytes paraResponse = 2;
+}
+
+// service method
+service MonaiFLService{
+  rpc ParamTransfer(ParamsRequest) returns (ParamsResponse);
+}

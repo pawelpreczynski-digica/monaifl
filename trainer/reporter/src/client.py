@@ -1,33 +1,22 @@
 import grpc
-import datacom_pb2_grpc as pb2_grpc
-import datacom_pb2 as pb2
+from monaifl_pb2_grpc import MonaiFLServiceStub
+from monaifl_pb2 import ParamsRequest
+from io import BytesIO
+import numpy as np
+import torch as t
 
-class flClient(object):
-    """
-    Client for gRPC functionality
-    """
+channel = grpc.insecure_channel("localhost:50051")
+client = MonaiFLServiceStub(channel)
 
-    def __init__(self):
-        self.host = 'localhost'
-        self.server_port = 50051
+x = t.randn(2,10)
 
-        # instantiate a channel
-        self.channel = grpc.insecure_channel(
-            '{}:{}'.format(self.host, self.server_port))
+print('Preparing Tensor on Client:', x)
+request_bytes = BytesIO()
+np.save(request_bytes, x, allow_pickle=False)
+request = ParamsRequest(paraRequest=request_bytes.getvalue())
 
-        # bind the client and the server
-        self.stub = pb2_grpc.PlainMessageStub(self.channel)
+response = client.ParamTransfer(request)
+response_bytes = BytesIO(response.paraResponse)
+response_data = np.load(response_bytes, allow_pickle=False)
 
-    def get_url(self, message):
-        """
-        Client function to call the rpc for GetServerResponse
-        """
-        message = pb2.Message(message=message)
-        print(f'{message}')
-        return self.stub.GetServerResponse(message)
-
-
-if __name__ == '__main__':
-    client = flClient()
-    result = client.get_url(message="Hello Server you there?")
-    print(f'{result}')
+print('Received Tensor: ', response_data)

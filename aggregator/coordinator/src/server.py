@@ -1,32 +1,34 @@
-import grpc
 from concurrent import futures
-import time
-import datacom_pb2_grpc as pb2_grpc
-import datacom_pb2 as pb2
+from io import BytesIO
+import numpy as np
+import grpc
+import monaifl_pb2_grpc
+from monaifl_pb2 import ParamsResponse
+import torch as t
 
-
-class PlainMessageService(pb2_grpc.PlainMessageServicer):
-
-    def __init__(self, *args, **kwargs):
-        pass
-
-    def GetServerResponse(self, request, context):
-
-        # get the string from the incoming request
-        message = request.message
-        result = f'Hello I am up and running received "{message}" message from you'
-        result = {'message': result, 'received': True}
-        return pb2.MessageResponse(**result)
-
+class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
+    def ParamTransfer(self, request, context):
+        print(request)
+        request_bytes = BytesIO(request.paraRequest)
+        request_data = np.load(request_bytes, allow_pickle=False)
+        print("Received Tensor from Client")
+     #   print('Received Tensor from Client: ', request_data)
+        print("Computing Operations on Tensors")        
+        x = request_data + 5
+     #   print('Server Tensor:', x)
+        response_bytes = BytesIO()
+        np.save(response_bytes, x, allow_pickle=False)
+        print("Sent Tensor from Client")
+        return ParamsResponse(paraResponse=response_bytes.getvalue())
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    pb2_grpc.add_PlainMessageServicer_to_server(PlainMessageService(), server)
-    server.add_insecure_port('[::]:50051')
+    monaifl_pb2_grpc.add_MonaiFLServiceServicer_to_server(
+        MonaiFLService(), server)
+    server.add_insecure_port("[::]:50051")
     server.start()
-    print("server is running and waiting for clients...")
+    print("Waiting for client tensors...")
     server.wait_for_termination()
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     serve()
