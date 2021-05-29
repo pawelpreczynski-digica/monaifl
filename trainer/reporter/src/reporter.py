@@ -33,17 +33,15 @@ class Net(nn.Module):
         return F.log_softmax(x)
 
 
-def getWeights():
+def getLocalParameters():
     model = Net()
     optimizer = optim.SGD(model.parameters(), lr=0.00, momentum=0.0)
-    #print(model.state_dict())
-    #print(optimizer.state_dict())
-    #model.load_state_dict(torch.load(modelFile))
-    #model.eval()
-    w_local = model.state_dict() # have to load the model
-    for param_tensor in model.state_dict():
-        print(param_tensor, "\t", model.state_dict()[param_tensor])
+    w_local = model.state_dict() # [val for key, val in model.state_dict().items()]
+ #   print(w_local)
+    return (w_local)
+    
+getLocalParameters()
 
-    #return w_local
 
-getWeights()
+# def get_parameters(self):
+#         return [val.cpu().numpy() for _, val in model.state_dict().items()]

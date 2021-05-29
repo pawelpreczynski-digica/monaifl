@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\rmonaifl.proto\x12\tprotobufs\"$\n\rParamsRequest\x12\x13\n\x0bparaRequest\x18\x01 \x01(\x0c\"&\n\x0eParamsResponse\x12\x14\n\x0cparaResponse\x18\x02 \x01(\x0c\x32V\n\x0eMonaiFLService\x12\x44\n\rParamTransfer\x12\x18.protobufs.ParamsRequest\x1a\x19.protobufs.ParamsResponseb\x06proto3'
+  serialized_pb=b'\n\rmonaifl.proto\x12\tprotobufs\"%\n\rParamsRequest\x12\x14\n\x0cpara_request\x18\x01 \x01(\x0c\"\'\n\x0eParamsResponse\x12\x15\n\rpara_response\x18\x02 \x01(\x0c\x32V\n\x0eMonaiFLService\x12\x44\n\rParamTransfer\x12\x18.protobufs.ParamsRequest\x1a\x19.protobufs.ParamsResponseb\x06proto3'
 )
 
 
@@ -34,7 +34,7 @@ _PARAMSREQUEST = _descriptor.Descriptor(
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='paraRequest', full_name='protobufs.ParamsRequest.paraRequest', index=0,
+      name='para_request', full_name='protobufs.ParamsRequest.para_request', index=0,
       number=1, type=12, cpp_type=9, label=1,
       has_default_value=False, default_value=b"",
       message_type=None, enum_type=None, containing_type=None,
@@ -53,7 +53,7 @@ _PARAMSREQUEST = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=28,
-  serialized_end=64,
+  serialized_end=65,
 )
 
 
@@ -66,7 +66,7 @@ _PARAMSRESPONSE = _descriptor.Descriptor(
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='paraResponse', full_name='protobufs.ParamsResponse.paraResponse', index=0,
+      name='para_response', full_name='protobufs.ParamsResponse.para_response', index=0,
       number=2, type=12, cpp_type=9, label=1,
       has_default_value=False, default_value=b"",
       message_type=None, enum_type=None, containing_type=None,
@@ -84,8 +84,8 @@ _PARAMSRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=66,
-  serialized_end=104,
+  serialized_start=67,
+  serialized_end=106,
 )
 
 DESCRIPTOR.message_types_by_name['ParamsRequest'] = _PARAMSREQUEST
@@ -115,8 +115,8 @@ _MONAIFLSERVICE = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=106,
-  serialized_end=192,
+  serialized_start=108,
+  serialized_end=194,
   methods=[
   _descriptor.MethodDescriptor(
     name='ParamTransfer',

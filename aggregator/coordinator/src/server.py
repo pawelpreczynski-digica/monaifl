@@ -5,22 +5,25 @@ import grpc
 import monaifl_pb2_grpc
 from monaifl_pb2 import ParamsResponse
 import torch as t
+import copy
+from coordinator import FedAvg
+import json
 
+w_loc = []
 class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
     def ParamTransfer(self, request, context):
-        print(request)
-        request_bytes = BytesIO(request.paraRequest)
-        request_data = np.load(request_bytes, allow_pickle=False)
-        print("Received Tensor from Client")
-     #   print('Received Tensor from Client: ', request_data)
-        print("Computing Operations on Tensors")        
-        x = request_data + 5
-     #   print('Server Tensor:', x)
-        response_bytes = BytesIO()
-        np.save(response_bytes, x, allow_pickle=False)
-        print("Sent Tensor from Client")
-        return ParamsResponse(paraResponse=response_bytes.getvalue())
-
+        request_bytes = BytesIO(request.para_request)
+        request_data = t.load(request_bytes)
+        print('Received Tensor from Client: ', request_data)
+        print("Computing Operations on Tensors")     
+        w = request_data
+        w_loc.append(copy.deepcopy(w))
+        w_glob = FedAvg(w_loc)
+        print(w_glob)
+        buffer = BytesIO()
+        t.save(w_glob, buffer)
+        return ParamsResponse(para_response=buffer.getvalue())
+ 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     monaifl_pb2_grpc.add_MonaiFLServiceServicer_to_server(

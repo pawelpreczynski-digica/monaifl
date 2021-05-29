@@ -3,12 +3,12 @@ syntax = "proto3";
 package protobufs;
 
 message ParamsRequest {
-    bytes paraRequest = 1;
+  bytes para_request = 1;  
 }
 
 // normalized training data
-message ParamsResponse {
-    bytes paraResponse = 2;
+message ParamsResponse {  
+  bytes para_response = 2;
 }
 
 // service method
