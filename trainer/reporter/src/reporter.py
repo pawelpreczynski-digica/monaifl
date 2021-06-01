@@ -6,11 +6,12 @@ import torch.optim as optim
 import os.path
 import sys
 
-ProjecttDir = os.getcwd()
-sys.path.insert(-2, ProjecttDir)
+from pathlib import Path
+home = str(Path.home())
 
+print(home)
+modelpath = os.path.join(home, "fl-architecture", "trainer", "save","models","client")
 
-modelpath = '/save/models/client'
 modelName = 'MNIST-test.pth.tar'
 modelFile = os.path.join(modelpath, modelName)
 
@@ -34,14 +35,36 @@ class Net(nn.Module):
 
 
 def getLocalParameters():
+    # create model object 
     model = Net()
-    optimizer = optim.SGD(model.parameters(), lr=0.00, momentum=0.0)
-    w_local = model.state_dict() # [val for key, val in model.state_dict().items()]
- #   print(w_local)
-    return (w_local)
+    w_local = []
+    # load model from path
+    if (os.path.exists(modelFile)):
+        model.load_state_dict(torch.load(modelFile))
+        # copy state_dictionary in a temporary variable
+        w_local = model.state_dict()
+    # return temporary variable
+    else:
+        print("This seems to be first round. Please train the local model now by running testMNIST.py")
+    return (w_local)   
     
-getLocalParameters()
 
+def setLocalParameters(recv_params):
+    # create model object 
+    model = Net()
+    # deserialize new model parameters
+    model.load_state_dict(torch.load(recv_params))
+    # set optimizer but disable learnability
+    optimizer = optim.SGD(model.parameters(), lr=0.00, momentum=0.0)
+    # evaluate model to reset the dropouts and batchnorms
+    model.eval()
+    # print model_state disctionary
+    print(model.state_dict())
+    #print file path
+    print(modelFile)
+    # serialize and save model file
+    torch.save(model.state_dict(), modelFile)
+    
 
 # def get_parameters(self):
 #         return [val.cpu().numpy() for _, val in model.state_dict().items()]

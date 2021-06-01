@@ -8,18 +8,21 @@ import io
 import copy
 
 
-from reporter import getLocalParameters
+from reporter import getLocalParameters, setLocalParameters
 
 channel = grpc.insecure_channel("localhost:50051")
 client = MonaiFLServiceStub(channel)
 
 y = getLocalParameters()
-print('Preparing Tensor on Client:', y)
-buffer = BytesIO()
-t.save(y, buffer)
-request = ParamsRequest(para_request= buffer.getvalue())#request_bytes.getvalue()})
-response = client.ParamTransfer(request)
-print(response)
-response_bytes = BytesIO(response.para_response)
-response_data = t.load(response_bytes)
-print('Received Tensor from Server: ', response_data)
+if(y):
+    print('Preparing Tensor on Client:', y)
+    buffer = BytesIO()
+    t.save(y, buffer)
+    request = ParamsRequest(para_request= buffer.getvalue())#request_bytes.getvalue()})
+    response = client.ParamTransfer(request)
+    print(response)
+    response_bytes = BytesIO(response.para_response)
+    setLocalParameters(response_bytes)
+else:
+    print("Local model not available yet...")
+

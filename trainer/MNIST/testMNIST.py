@@ -10,11 +10,16 @@ from torch.autograd import Variable
 import sys
 import os
 
-ProjecttDir = os.getcwd()
-sys.path.insert(1, ProjecttDir)
+from pathlib import Path
+home = str(Path.home())
 
+print(home)
+modelpath = os.path.join(home, "fl-architecture", "trainer", "save","models","client")
 
-modelpath = './save/models'
+#ProjecttDir = os.getcwd()
+#sys.path.insert(1, ProjecttDir)
+#modelpath = './save/models'
+ 
 modelName = 'MNIST-test.pth.tar'
 modelFile = os.path.join(modelpath, modelName)
 
@@ -98,6 +103,8 @@ def test():
         test_loss, correct, len(test_loader.dataset),
         100. * correct / len(test_loader.dataset)))
 
+# if (os.path.exists(modelFile)):
+#     model = torch.load(modelFile)
 
 for epoch in range(1, 3):
     train(epoch)
@@ -106,4 +113,4 @@ for epoch in range(1, 3):
 print(model.state_dict())
 
 print(modelFile)
-torch.save(model.state_dict(), modelFile) #'./save/models/MNISTmodel.pth')
+torch.save(model.state_dict(), modelFile) 
