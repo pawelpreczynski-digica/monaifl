@@ -9,7 +9,7 @@ from torchvision import datasets, transforms
 from torch.autograd import Variable
 import sys
 import os
-
+import numpy 
 from pathlib import Path
 home = str(Path.home())
 
@@ -24,7 +24,7 @@ modelName = 'MNIST-test.pth.tar'
 modelFile = os.path.join(modelpath, modelName)
 
 # Training settings
-batch_size = 128
+batch_size = 256
 
 # MNIST Dataset
 train_dataset = datasets.MNIST(root='./data/',
@@ -64,11 +64,6 @@ class Net(nn.Module):
         return F.log_softmax(x)
 
 
-model = Net()
-
-optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.5)
-
-
 def train(epoch):
     model.train()
     for batch_idx, (data, target) in enumerate(train_loader):
@@ -83,8 +78,6 @@ def train(epoch):
                 epoch, batch_idx * len(data), len(train_loader.dataset),
                 100. * batch_idx / len(train_loader), loss.data))
     
-
-
 def test():
     model.eval()
     test_loss = 0
@@ -99,18 +92,36 @@ def test():
         correct += pred.eq(target.data.view_as(pred)).cpu().sum()
 
     test_loss /= len(test_loader.dataset)
-    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
-        test_loss, correct, len(test_loader.dataset),
-        100. * correct / len(test_loader.dataset)))
+    test_accuracy = correct / len(test_loader.dataset)*100
+    result = test_loss, test_accuracy
+    return result
+        #print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
+    #    test_loss, correct, len(test_loader.dataset),
+    #    100. * correct / len(test_loader.dataset)))
 
-# if (os.path.exists(modelFile)):
-#     model = torch.load(modelFile)
+if (os.path.exists(modelFile)):
+    model = Net()
+    optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.5)
+    model.load_state_dict(torch.load(modelFile))
+    model.eval()
+#   model = torch.load(modelFile)
 
-for epoch in range(1, 3):
-    train(epoch)
-    test()
+    for epoch in range(1, 3):
+        train(epoch)
+        loss, accuracy = test()
+        print("Average Loss: " + str(loss.numpy()) + " Avergare Accuracy: "+ str(accuracy.numpy()))
+ #  print(model.state_dict())
 
-print(model.state_dict())
+ 
+else:
+    print("Local model does not exist...")
+    model = Net()
+    optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.5)
+
+    for epoch in range(1, 3):
+        train(epoch)
+        loss, accuracy = test()
+        print("Average Loss: " + str(loss.numpy()) + " Avergare Accuracy: "+ str(accuracy.numpy())) 
 
 print(modelFile)
-torch.save(model.state_dict(), modelFile) 
+torch.save(model.state_dict(), modelFile)
