@@ -22,6 +22,9 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   serialized_pb=b'\n\rmonaifl.proto\x12\tprotobufs\"%\n\rParamsRequest\x12\x14\n\x0cpara_request\x18\x01 \x01(\x0c\"\'\n\x0eParamsResponse\x12\x15\n\rpara_response\x18\x02 \x01(\x0c\x32V\n\x0eMonaiFLService\x12\x44\n\rParamTransfer\x12\x18.protobufs.ParamsRequest\x1a\x19.protobufs.ParamsResponseb\x06proto3'
 )
 
+
+
+
 _PARAMSREQUEST = _descriptor.Descriptor(
   name='ParamsRequest',
   full_name='protobufs.ParamsRequest',

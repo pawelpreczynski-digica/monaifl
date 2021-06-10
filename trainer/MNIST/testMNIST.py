@@ -10,6 +10,10 @@ from torch.autograd import Variable
 import sys
 import os
 import numpy 
+
+#from torch.utils.tensorboard import SummaryWriter
+#writer = SummaryWriter()
+
 from pathlib import Path
 home = str(Path.home())
 
@@ -44,8 +48,6 @@ train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
 test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
                                           batch_size=batch_size,
                                           shuffle=False)
-
-
 class Net(nn.Module):
 
     def __init__(self):
@@ -71,6 +73,7 @@ def train(epoch):
         optimizer.zero_grad()
         output = model(data)
         loss = F.nll_loss(output, target)
+        #writer.add_scalar("Loss/train", loss, epoch)
         loss.backward()
         optimizer.step()
         if batch_idx % 10 == 0:
@@ -106,10 +109,15 @@ if (os.path.exists(modelFile)):
     model.eval()
 #   model = torch.load(modelFile)
 
-    for epoch in range(1, 3):
+    for epoch in range(0, 15):
         train(epoch)
         loss, accuracy = test()
         print("Average Loss: " + str(loss.numpy()) + " Avergare Accuracy: "+ str(accuracy.numpy()))
+        logentry = str(epoch)+"," + str(loss.numpy())+"," + str(accuracy.numpy())+"\n"
+        f = open("mnistlog.txt", "a")
+        f.writelines(logentry)
+        f.close()
+ 
  #  print(model.state_dict())
 
  
@@ -118,10 +126,15 @@ else:
     model = Net()
     optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.5)
 
-    for epoch in range(1, 3):
+    for epoch in range(0, 15):
         train(epoch)
         loss, accuracy = test()
-        print("Average Loss: " + str(loss.numpy()) + " Avergare Accuracy: "+ str(accuracy.numpy())) 
+        print("Average Loss: " + str(loss.numpy()) + " Avergare Accuracy: "+ str(accuracy.numpy()))
+        logentry = str(epoch)+"," + str(loss.numpy())+"," + str(accuracy.numpy())+"\n"
+        f = open("mnistlog.txt", "a")
+        f.writelines(logentry)
+        f.close()
 
 print(modelFile)
 torch.save(model.state_dict(), modelFile)
+#writer.close()
