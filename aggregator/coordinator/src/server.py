@@ -2,8 +2,8 @@ from concurrent import futures
 from io import BytesIO
 import numpy as np
 import grpc
-import monaifl_pb2_grpc
-from monaifl_pb2 import ParamsResponse
+from monaifl.common import monaifl_pb2_grpc
+from monaifl.common.monaifl_pb2 import ParamsResponse
 import torch as t
 import copy
 from coordinator import FedAvg, setGlobalParameters 

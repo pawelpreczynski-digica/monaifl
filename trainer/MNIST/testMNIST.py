@@ -11,21 +11,17 @@ import sys
 import os
 import numpy 
 
-#from torch.utils.tensorboard import SummaryWriter
-#writer = SummaryWriter()
-
 from pathlib import Path
 home = str(Path.home())
 
 print(home)
 modelpath = os.path.join(home, "fl-architecture", "trainer", "save","models","client")
-
-#ProjecttDir = os.getcwd()
-#sys.path.insert(1, ProjecttDir)
-#modelpath = './save/models'
+logpath = os.path.join(home, "fl-architecture", "trainer", "save","logs","client")
  
 modelName = 'MNIST-test.pth.tar'
 modelFile = os.path.join(modelpath, modelName)
+logName = 'mnistlog.txt'
+logFile = os.path.join(logpath, logName)
 
 # Training settings
 batch_size = 256
@@ -44,7 +40,6 @@ test_dataset = datasets.MNIST(root='./data/',
 train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
                                            batch_size=batch_size,
                                            shuffle=True)
-
 test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
                                           batch_size=batch_size,
                                           shuffle=False)
@@ -73,7 +68,6 @@ def train(epoch):
         optimizer.zero_grad()
         output = model(data)
         loss = F.nll_loss(output, target)
-        #writer.add_scalar("Loss/train", loss, epoch)
         loss.backward()
         optimizer.step()
         if batch_idx % 10 == 0:
@@ -98,23 +92,19 @@ def test():
     test_accuracy = correct / len(test_loader.dataset)*100
     result = test_loss, test_accuracy
     return result
-        #print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
-    #    test_loss, correct, len(test_loader.dataset),
-    #    100. * correct / len(test_loader.dataset)))
 
 if (os.path.exists(modelFile)):
     model = Net()
     optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.5)
     model.load_state_dict(torch.load(modelFile))
     model.eval()
-#   model = torch.load(modelFile)
 
     for epoch in range(0, 15):
         train(epoch)
         loss, accuracy = test()
         print("Average Loss: " + str(loss.numpy()) + " Avergare Accuracy: "+ str(accuracy.numpy()))
         logentry = str(epoch)+"," + str(loss.numpy())+"," + str(accuracy.numpy())+"\n"
-        f = open("mnistlog.txt", "a")
+        f = open(logFile, "a")
         f.writelines(logentry)
         f.close()
  
@@ -131,10 +121,9 @@ else:
         loss, accuracy = test()
         print("Average Loss: " + str(loss.numpy()) + " Avergare Accuracy: "+ str(accuracy.numpy()))
         logentry = str(epoch)+"," + str(loss.numpy())+"," + str(accuracy.numpy())+"\n"
-        f = open("mnistlog.txt", "a")
+        f = open(logFile, "a")
         f.writelines(logentry)
         f.close()
 
 print(modelFile)
 torch.save(model.state_dict(), modelFile)
-#writer.close()
