@@ -7,15 +7,13 @@ import os
 from pathlib import Path
 home = str(Path.home())
 
-logpath = os.path.join(home, "fl-architecture", "trainer", "save","logs","client")
+logpath = os.path.join(home, "monaifl", "trainer", "save","logs","client")
 logName = 'mnistlog.txt'
 logFile = os.path.join(logpath, logName)
 
 style.use('seaborn')
 fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, sharex=True, figsize=(20, 15))
-#fig = plt.figure()
-#ax1 = fig.add_subplot(1,1,1)
-#ax2 = fig.add_subplot(2,1,1)
+
 def animate(i):
     graph_data = open(logFile,'r').read()
     lines = graph_data.split('\n')

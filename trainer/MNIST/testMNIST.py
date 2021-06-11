@@ -15,8 +15,8 @@ from pathlib import Path
 home = str(Path.home())
 
 print(home)
-modelpath = os.path.join(home, "fl-architecture", "trainer", "save","models","client")
-logpath = os.path.join(home, "fl-architecture", "trainer", "save","logs","client")
+modelpath = os.path.join(home, "monaifl", "trainer", "save","models","client")
+logpath = os.path.join(home, "monaifl", "trainer", "save","logs","client")
  
 modelName = 'MNIST-test.pth.tar'
 modelFile = os.path.join(modelpath, modelName)

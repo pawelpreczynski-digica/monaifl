@@ -1,3 +1,6 @@
+import sys
+sys.path.insert(1, '/.../monaifl/common')
+
 import grpc
 from monaifl_pb2_grpc import MonaiFLServiceStub
 from monaifl_pb2 import ParamsRequest
