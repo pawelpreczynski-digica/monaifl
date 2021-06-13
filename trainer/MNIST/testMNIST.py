@@ -11,6 +11,8 @@ import sys
 import os
 import numpy 
 
+#from torch.utils.tensorboard import SummaryWriter
+
 from pathlib import Path
 home = str(Path.home())
 
@@ -22,6 +24,9 @@ modelName = 'MNIST-test.pth.tar'
 modelFile = os.path.join(modelpath, modelName)
 logName = 'mnistlog.txt'
 logFile = os.path.join(logpath, logName)
+
+#writer object for tensorboard visualization.
+#writer = SummaryWriter()
 
 # Training settings
 batch_size = 256
@@ -68,6 +73,7 @@ def train(epoch):
         optimizer.zero_grad()
         output = model(data)
         loss = F.nll_loss(output, target)
+#        writer.add_scalar("Loss/train", loss, epoch)
         loss.backward()
         optimizer.step()
         if batch_idx % 10 == 0:
@@ -98,8 +104,10 @@ if (os.path.exists(modelFile)):
     optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.5)
     model.load_state_dict(torch.load(modelFile))
     model.eval()
-
-    for epoch in range(0, 15):
+    file = open(logFile,"w")
+    file.truncate(0)
+    file.close()
+    for epoch in range(0, 100):
         train(epoch)
         loss, accuracy = test()
         print("Average Loss: " + str(loss.numpy()) + " Avergare Accuracy: "+ str(accuracy.numpy()))
@@ -115,7 +123,9 @@ else:
     print("Local model does not exist...")
     model = Net()
     optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.5)
-
+    file = open(logFile,"w")
+    file.truncate(0)
+    file.close()
     for epoch in range(0, 15):
         train(epoch)
         loss, accuracy = test()
@@ -124,6 +134,9 @@ else:
         f = open(logFile, "a")
         f.writelines(logentry)
         f.close()
+
+#writer.flush()
+#writer.close()
 
 print(modelFile)
 torch.save(model.state_dict(), modelFile)
