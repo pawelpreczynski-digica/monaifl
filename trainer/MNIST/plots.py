@@ -10,6 +10,7 @@ import numpy as np
 #from scipy.interpolate import CubicSpline
 from scipy import interpolate
 logpath = os.path.join(home, "monaifl", "trainer", "save","logs","client")
+#logName = 'mnistlog.txt'
 logName = 'mnistlog.txt'
 logFile = os.path.join(logpath, logName)
 

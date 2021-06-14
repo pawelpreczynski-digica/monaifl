@@ -18,18 +18,35 @@ from monai.metrics import compute_roc_auc
 np.random.seed(0)
 print_config()
 
-ProjecttDir = os.getcwd()
-sys.path.insert(1, ProjecttDir)
 
+from pathlib import Path
+home = str(Path.home())
 
-datapath= 'trainer/MONAI/save/data'
+print(home)
+
+datapath= os.path.join(home, "monaifl", "trainer", "MONAI","data")
 datasetName = 'MedNIST'
 data_dir = os.path.join(datapath, datasetName)
-print(data_dir)
-
-modelpath = 'trainer/MONAI/save/models'
-modelName = 'MONAI-test.pth.tar'
+ 
+modelpath = os.path.join(home, "monaifl", "trainer", "save","models","client")
+modelName = 'monai-test.pth.tar'
 modelFile = os.path.join(modelpath, modelName)
+
+logpath = os.path.join(home, "monaifl", "trainer", "save","logs","client")
+logName = 'monailog.txt'
+logFile = os.path.join(logpath, logName)
+
+
+# ProjecttDir = os.getcwd()
+# sys.path.insert(1, ProjecttDir)
+
+
+# datapath= 'trainer/MONAI/data'
+# print(data_dir)
+
+# modelpath = 'trainer/MONAI/save/models'
+# modelName = 'MONAI-test.pth.tar'
+# modelFile = os.path.join(modelpath, modelName)
 
 #data_dir = 'C:/Users/mhreh/research/MedNIST/'
 class_names = sorted([x for x in os.listdir(data_dir) if os.path.isdir(os.path.join(data_dir, x))])
@@ -126,7 +143,7 @@ model = densenet121(
 ).to(device)
 loss_function = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), 1e-5)
-epoch_num = 1 #4
+epoch_num = 10
 val_interval = 1
 
 best_metric = -1
@@ -163,7 +180,7 @@ for epoch in range(epoch_num):
                 val_images, val_labels = val_data[0].to(device), val_data[1].to(device)
                 y_pred = torch.cat([y_pred, model(val_images)], dim=0)
                 y = torch.cat([y, val_labels], dim=0)
-            auc_metric = compute_roc_auc(y_pred, y, to_onehot_y=True, softmax=True)
+            auc_metric = compute_roc_auc(y_pred, y)
             metric_values.append(auc_metric)
             acc_value = torch.eq(y_pred.argmax(dim=1), y)
             acc_metric = acc_value.sum().item() / len(acc_value)
@@ -175,5 +192,9 @@ for epoch in range(epoch_num):
             print(f"current epoch: {epoch + 1} current AUC: {auc_metric:.4f}"
                   f" current accuracy: {acc_metric:.4f} best AUC: {best_metric:.4f}"
                   f" at epoch: {best_metric_epoch}")
+            logentry = str(epoch)+"," + str(auc_metric.numpy())+"," + str(acc_metric.numpy())+"\n"
+            f = open(logFile, "a")
+            f.writelines(logentry)
+            f.close()
 print(f"train completed, best_metric: {best_metric:.4f} at epoch: {best_metric_epoch}")
 
