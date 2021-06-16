@@ -251,7 +251,7 @@ model = DenseNet121(spatial_dims=2, in_channels=1,
                     out_channels=num_class).to(device)
 loss_function = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), 1e-5)
-max_epochs = 100
+max_epochs = 2
 val_interval = 1
 
 """## Model training

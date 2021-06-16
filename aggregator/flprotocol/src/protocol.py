@@ -3,3 +3,36 @@
 # It will monitor the global training performance
 # it will enable the selection/deseletion of training nodes
 # it will enable faireness, data distribution, and all other relevant FL properties for a decentralized and trustworthy FL system
+
+import os
+import subprocess
+import py_compile
+from subprocess import Popen
+
+from pathlib import Path
+home = str(Path.home())
+
+print(home)
+
+serverPath = os.path.join(home, "monaifl", "aggregator", "coordinator","src")
+serverFile = "server.py"
+server = os.path.join(serverPath, serverFile)
+
+clientPath= os.path.join(home, "monaifl", "trainer", "reporter","src")
+clientFile = "client.py"
+client = os.path.join(clientPath, clientFile)
+
+pipelinePath= os.path.join(home, "monaifl", "trainer", "MONAI","pipeline")
+codeFile = "mednist.py"
+pipeline = os.path.join(pipelinePath, codeFile)
+
+
+def flprotocol():
+    p = Popen(["python", server])
+    for i in range(2):
+        print("Initial Global Model Transferred!")
+        p = Popen(["python", pipeline])
+        p.wait()        
+        p = Popen(["python", client])
+
+flprotocol()
