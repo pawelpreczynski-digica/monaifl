@@ -26,10 +26,18 @@ pipelinePath= os.path.join(home, "monaifl", "trainer", "MONAI","pipeline")
 codeFile = "mednist.py"
 pipeline = os.path.join(pipelinePath, codeFile)
 
+logpathglobal = os.path.join(home, "monaifl", "save","logs","client")
+logNameglobal = 'globalmonailog.txt'
+logFileGlobal = os.path.join(logpathglobal, logNameglobal)
+
 
 def flprotocol():
+    if (os.path.exists(logFileGlobal)):
+        file = open(logFileGlobal,"w")
+        file.truncate(0)
+        file.close()
     p = Popen(["python", server])
-    for i in range(2):
+    for i in range(5):
         print("Initial Global Model Transferred!")
         p = Popen(["python", pipeline])
         p.wait()        

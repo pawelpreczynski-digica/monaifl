@@ -12,7 +12,7 @@ from pathlib import Path
 home = str(Path.home())
 
 print(home)
-modelpath = os.path.join(home, "monaifl", "trainer", "save","models","server")
+modelpath = os.path.join(home, "monaifl", "save","models","server")
 
 modelName = 'MNIST-test.pth.tar'
 modelFile = os.path.join(modelpath, modelName)

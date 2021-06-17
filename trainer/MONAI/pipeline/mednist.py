@@ -67,7 +67,7 @@ from monai.transforms import (
 )
 from monai.utils import set_determinism
 
-print_config()
+#print_config()
 
 """## Setup data directory
 
@@ -76,9 +76,9 @@ This allows you to save results and reuse downloads.
 If not specified a temporary directory will be used.
 """
 
-directory = os.environ.get("MONAI_DATA_DIRECTORY")
-root_dir = tempfile.mkdtemp() if directory is None else directory
-print(root_dir)
+# directory = os.environ.get("MONAI_DATA_DIRECTORY")
+# root_dir = tempfile.mkdtemp() if directory is None else directory
+# print(root_dir)
 
 """## Download dataset
 
@@ -119,13 +119,17 @@ datapath= os.path.join(home, "monaifl", "trainer", "MONAI","data")
 datasetName = 'MedNIST'
 data_dir = os.path.join(datapath, datasetName)
  
-modelpath = os.path.join(home, "monaifl", "trainer", "save","models","client")
+modelpath = os.path.join(home, "monaifl", "save","models","client")
 modelName = 'monai-test.pth.tar'
 modelFile = os.path.join(modelpath, modelName)
 
-logpath = os.path.join(home, "monaifl", "trainer", "save","logs","client")
-logName = 'monailog.txt'
-logFile = os.path.join(logpath, logName)
+logpathlocal = os.path.join(home, "monaifl", "save","logs","client")
+logNamelocal = 'localmonailog.txt'
+logFileLocal = os.path.join(logpathlocal, logNamelocal)
+
+logpathglobal = os.path.join(home, "monaifl", "save","logs","client")
+logNameglobal = 'globalmonailog.txt'
+logFileGlobal = os.path.join(logpathglobal, logNameglobal)
 
 class_names = sorted(x for x in os.listdir(data_dir)
                      if os.path.isdir(os.path.join(data_dir, x)))
@@ -161,7 +165,7 @@ for i, k in enumerate(np.random.randint(num_total, size=9)):
     plt.xlabel(class_names[image_class[k]])
     plt.imshow(arr, cmap="gray", vmin=0, vmax=255)
 plt.tight_layout()
-plt.show()
+#plt.show()
 
 """## Prepare training, validation and test data lists
 
@@ -264,10 +268,20 @@ best_metric = -1
 best_metric_epoch = -1
 epoch_loss_values = []
 metric_values = []
-if (os.path.exists(logFile)):
-    file = open(logFile,"w")
+if (os.path.exists(logFileLocal)):
+    file = open(logFileLocal,"w")
     file.truncate(0)
     file.close()
+
+logentryglobal = ""
+global_round = 0
+if (os.path.exists(logFileGlobal)):
+    file = open(logFileGlobal, "r")
+    for line in file:
+        if line != "\n":
+            global_round += 1
+    file.close()
+
 for epoch in range(max_epochs):
     print("-" * 10)
     print(f"epoch {epoch + 1}/{max_epochs}")
@@ -313,6 +327,7 @@ for epoch in range(max_epochs):
             if auc_metric > best_metric:
                 best_metric = auc_metric
                 best_metric_epoch = epoch + 1
+                logentryglobal = str(global_round)+"," + str(epoch_loss)+"," + str(best_metric)+"\n"
                 torch.save(model.state_dict(), modelFile)
 #                torch.save(model.state_dict(), os.path.join(
 #                    root_dir, "best_metric_model.pth"))
@@ -323,31 +338,33 @@ for epoch in range(max_epochs):
                 f" best AUC: {best_metric:.4f}"
                 f" at epoch: {best_metric_epoch}"
             )
-            logentry = str(epoch)+"," + str(epoch_loss)+"," + str(auc_metric)+"\n"
-            f = open(logFile, "a")
-            f.writelines(logentry)
+            logentrylocal = str(epoch)+"," + str(epoch_loss)+"," + str(auc_metric)+"\n"
+            f = open(logFileLocal, "a")
+            f.writelines(logentrylocal)
             f.close()
 
 print(
     f"train completed, best_metric: {best_metric:.4f} "
     f"at epoch: {best_metric_epoch}")
-
+f = open(logFileGlobal, "a")
+f.writelines(logentryglobal)
+f.close()
 """## Plot the loss and metric"""
 
-plt.figure("train", (12, 6))
-plt.subplot(1, 2, 1)
-plt.title("Epoch Average Loss")
-x = [i + 1 for i in range(len(epoch_loss_values))]
-y = epoch_loss_values
-plt.xlabel("epoch")
-plt.plot(x, y)
-plt.subplot(1, 2, 2)
-plt.title("Val AUC")
-x = [val_interval * (i + 1) for i in range(len(metric_values))]
-y = metric_values
-plt.xlabel("epoch")
-plt.plot(x, y)
-plt.show()
+# plt.figure("train", (12, 6))
+# plt.subplot(1, 2, 1)
+# plt.title("Epoch Average Loss")
+# x = [i + 1 for i in range(len(epoch_loss_values))]
+# y = epoch_loss_values
+# plt.xlabel("epoch")
+# plt.plot(x, y)
+# plt.subplot(1, 2, 2)
+# plt.title("Val AUC")
+# x = [val_interval * (i + 1) for i in range(len(metric_values))]
+# y = metric_values
+# plt.xlabel("epoch")
+# plt.plot(x, y)
+# plt.show()
 
 """## Evaluate the model on test dataset
 
@@ -380,5 +397,5 @@ print(classification_report(
 Remove directory if a temporary was used.
 """
 
-if directory is None:
-    shutil.rmtree(root_dir)
+# if directory is None:
+#     shutil.rmtree(root_dir)

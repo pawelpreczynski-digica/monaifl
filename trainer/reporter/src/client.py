@@ -1,5 +1,6 @@
-import sys
-sys.path.insert(1, '/.../monaifl/common')
+# import sys
+# sys.path.insert(0, '/.../common')
+# #trainer/reporter/src/client.py
 
 import grpc
 from monaifl_pb2_grpc import MonaiFLServiceStub
@@ -19,12 +20,13 @@ def client():
 
     y = getLocalParameters()
     if(y):
-        print('Preparing Tensor on Client:', y)
+        print('Preparing Tensor on Client:...')#, y)
         buffer = BytesIO()
         t.save(y, buffer)
         request = ParamsRequest(para_request= buffer.getvalue())#request_bytes.getvalue()})
         response = client.ParamTransfer(request)
-        print(response)
+        #print(response)
+        print("Aggregated Tensors Received on Client")
         response_bytes = BytesIO(response.para_response)
         setLocalParameters(response_bytes)
     else:

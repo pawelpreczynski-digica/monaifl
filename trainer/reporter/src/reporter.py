@@ -10,7 +10,7 @@ from pathlib import Path
 home = str(Path.home())
 
 print(home)
-modelpath = os.path.join(home, "monaifl", "trainer", "save","models","client")
+modelpath = os.path.join(home, "monaifl", "save","models","client")
 
 modelName = 'MNIST-test.pth.tar'
 modelFile = os.path.join(modelpath, modelName)
@@ -59,7 +59,8 @@ def setLocalParameters(recv_params):
     # evaluate model to reset the dropouts and batchnorms
     model.eval()
     # print model_state disctionary
-    print(model.state_dict())
+    #print(model.state_dict())
+    print("Updating Local Model...")
     #print file path
     print(modelFile)
     # serialize and save model file
