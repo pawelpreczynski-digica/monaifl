@@ -17,16 +17,18 @@ from pathlib import Path
 home = str(Path.home())
 
 print(home)
-modelpath = os.path.join(home, "monaifl", "trainer", "save","models","client")
-logpath = os.path.join(home, "monaifl", "trainer", "save","logs","client")
- 
+modelpath = os.path.join(home, "monaifl", "save","models","client")
 modelName = 'MNIST-test.pth.tar'
 modelFile = os.path.join(modelpath, modelName)
-logName = 'mnistlog.txt'
-logFile = os.path.join(logpath, logName)
 
-#writer object for tensorboard visualization.
-#writer = SummaryWriter()
+logpathlocal = os.path.join(home, "monaifl", "save","logs","client")
+logNamelocal = 'localmnistlog.txt'
+logFileLocal = os.path.join(logpathlocal, logNamelocal)
+
+logpathglobal = os.path.join(home, "monaifl", "save","logs","client")
+logNameglobal = 'globalmnistlog.txt'
+logFileGlobal = os.path.join(logpathglobal, logNameglobal)
+
 
 # Training settings
 batch_size = 256
@@ -99,44 +101,50 @@ def test():
     result = test_loss, test_accuracy
     return result
 
+
+model = Net()
+optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.5)
 if (os.path.exists(modelFile)):
-    model = Net()
-    optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.5)
     model.load_state_dict(torch.load(modelFile))
     model.eval()
-    file = open(logFile,"w")
-    file.truncate(0)
-    file.close()
-    for epoch in range(0, 100):
-        train(epoch)
-        loss, accuracy = test()
-        print("Average Loss: " + str(loss.numpy()) + " Avergare Accuracy: "+ str(accuracy.numpy()))
-        logentry = str(epoch)+"," + str(loss.numpy())+"," + str(accuracy.numpy())+"\n"
-        f = open(logFile, "a")
-        f.writelines(logentry)
-        f.close()
- 
- #  print(model.state_dict())
-
- 
 else:
     print("Local model does not exist...")
-    model = Net()
-    optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.5)
-    file = open(logFile,"w")
+
+best_metric = -1
+best_metric_epoch = -1
+epoch_loss_values = []
+metric_values = []
+
+if (os.path.exists(logFileLocal)):
+    file = open(logFileLocal,"w")
     file.truncate(0)
     file.close()
-    for epoch in range(0, 15):
+
+logentryglobal = ""
+global_round = 0
+if (os.path.exists(logFileGlobal)):
+    file = open(logFileGlobal, "r")
+    for line in file:
+        if line != "\n":
+            global_round += 1
+    file.close()
+for epoch in range(0, 10):
         train(epoch)
         loss, accuracy = test()
+        if accuracy > best_metric:
+                best_metric = accuracy
+                best_metric_epoch = epoch + 1
+                logentryglobal = str(global_round)+"," + str(loss.numpy())+"," + str(best_metric.numpy())+"\n"
+                torch.save(model.state_dict(), modelFile)
+#               
         print("Average Loss: " + str(loss.numpy()) + " Avergare Accuracy: "+ str(accuracy.numpy()))
-        logentry = str(epoch)+"," + str(loss.numpy())+"," + str(accuracy.numpy())+"\n"
-        f = open(logFile, "a")
-        f.writelines(logentry)
+        logentrylocal = str(epoch)+"," + str(loss.numpy())+"," + str(accuracy.numpy())+"\n"
+        f = open(logFileLocal, "a")
+        f.writelines(logentrylocal)
         f.close()
 
-#writer.flush()
-#writer.close()
-
+f = open(logFileGlobal, "a")
+f.writelines(logentryglobal)
+f.close()
 print(modelFile)
-torch.save(model.state_dict(), modelFile)
+#torch.save(model.state_dict(), modelFile)

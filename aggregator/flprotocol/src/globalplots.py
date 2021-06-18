@@ -11,7 +11,7 @@ import numpy as np
 from scipy import interpolate
 logpath = os.path.join(home, "monaifl", "save", "logs","client")
 #logName = 'mnistlog.txt'
-logName = 'globalmonailog.txt'
+logName = 'globalmnistlog.txt'
 logFile = os.path.join(logpath, logName)
 
 style.use('seaborn')

@@ -23,11 +23,15 @@ clientFile = "client.py"
 client = os.path.join(clientPath, clientFile)
 
 pipelinePath= os.path.join(home, "monaifl", "trainer", "MONAI","pipeline")
-codeFile = "mednist.py"
+#codeFile = "mednist.py"
+
+pipelinePath= os.path.join(home, "monaifl", "trainer", "MNIST")
+codeFile = "testMNIST.py"
+
 pipeline = os.path.join(pipelinePath, codeFile)
 
 logpathglobal = os.path.join(home, "monaifl", "save","logs","client")
-logNameglobal = 'globalmonailog.txt'
+logNameglobal = 'globalmnistlog.txt'
 logFileGlobal = os.path.join(logpathglobal, logNameglobal)
 
 

@@ -20,7 +20,7 @@ def client():
 
     y = getLocalParameters()
     if(y):
-        print('Preparing Tensor on Client:...')#, y)
+    #    print('Preparing Tensor on Client:...', y)
         buffer = BytesIO()
         t.save(y, buffer)
         request = ParamsRequest(para_request= buffer.getvalue())#request_bytes.getvalue()})

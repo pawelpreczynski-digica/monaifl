@@ -11,8 +11,8 @@ home = str(Path.home())
 
 print(home)
 modelpath = os.path.join(home, "monaifl", "save","models","client")
-
 modelName = 'MNIST-test.pth.tar'
+#modelName = 'monai-test.pth.tar'
 modelFile = os.path.join(modelpath, modelName)
 
 #print (modelFile)
