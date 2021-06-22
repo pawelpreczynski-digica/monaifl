@@ -41,7 +41,7 @@ def flprotocol():
         file.truncate(0)
         file.close()
     p = Popen(["python", server])
-    for i in range(5):
+    for i in range(20):
         print("Initial Global Model Transferred!")
         p = Popen(["python", pipeline])
         p.wait()        
