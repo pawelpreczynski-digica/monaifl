@@ -26,7 +26,7 @@ def client():
         request = ParamsRequest(para_request= buffer.getvalue())#request_bytes.getvalue()})
         response = client.ParamTransfer(request)
         #print(response)
-        print("Aggregated Tensors Received on Client")
+        print("Aggregated Tensors Received on Client...")
         response_bytes = BytesIO(response.para_response)
         setLocalParameters(response_bytes)
     else:

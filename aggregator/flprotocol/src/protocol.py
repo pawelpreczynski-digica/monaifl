@@ -34,6 +34,13 @@ logpathglobal = os.path.join(home, "monaifl", "save","logs","client")
 logNameglobal = 'globalmnistlog.txt'
 logFileGlobal = os.path.join(logpathglobal, logNameglobal)
 
+globalPlotPath = os.path.join(home, "monaifl", "aggregator","flprotocol",)
+globalPlotFile = 'globalplots.py'
+globalPlot = os.path.join(globalPlotPath, globalPlotFile)
+
+localPlotPath = os.path.join(home, "monaifl", "trainer","MNIST",)
+localPlotFile = 'localplots.py'
+localPlot = os.path.join(localPlotPath, localPlotFile)
 
 def flprotocol():
     if (os.path.exists(logFileGlobal)):
@@ -46,5 +53,4 @@ def flprotocol():
         p = Popen(["python", pipeline])
         p.wait()        
         p = Popen(["python", client])
-
-flprotocol()
+        
