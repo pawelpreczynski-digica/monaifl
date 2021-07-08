@@ -32,6 +32,9 @@ def client():
     else:
         print("Local model not available yet...")
 
+class pack
+
+
 client()
 
 # # Copyright 2020 Adap GmbH. All Rights Reserved.
