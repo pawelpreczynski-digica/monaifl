@@ -6,7 +6,7 @@ import os
 import torch
 from sklearn.metrics import classification_report
 from algo import Algo
-
+from utils import Mapping
 from monai.metrics import compute_roc_auc
 
 from monai.utils import set_determinism
@@ -34,7 +34,6 @@ class MonaiAlgo(Algo):
         #"""## Set deterministic training for reproducibility"""
         set_determinism(seed=0)
         device = torch.device("cuda:0")    
-
         val_interval = 1
         best_metric = -1
         best_metric_epoch = -1
@@ -84,16 +83,18 @@ class MonaiAlgo(Algo):
                 if auc_metric > best_metric:
                     best_metric = auc_metric
                     best_metric_epoch = epoch + 1
-                    torch.save(self.model.state_dict(), os.path.join(self.model_dir, "best_metric_model.pth"))
-                    print("saved new best metric model")
+                    best_model = self.model.state_dict()
+                #    torch.save(self.model.state_dict(), os.path.join(self.model_dir, "best_metric_model.pth"))
+                #    print("saved new best metric model")
                 print(
                     f"current epoch: {epoch + 1} current AUC: {auc_metric:.4f}"
                     f" current accuracy: {acc_metric:.4f} best AUC: {best_metric:.4f}"
                     f" at epoch: {best_metric_epoch}"
                 )
-
+        checkpoint = Mapping()
+        checkpoint.update(epoch=best_metric_epoch, metric=best_metric, weights=best_model)
         print(f"train completed, best_metric: {best_metric:.4f} at epoch: {best_metric_epoch}")
-        #return new_model
+        return checkpoint
 
     def predict(self, X, model):
         predictions = 0

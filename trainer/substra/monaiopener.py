@@ -45,7 +45,7 @@ class MonaiOpener(Opener):
                 plt.xlabel(class_names[image_class[k]])
                 plt.imshow(arr, cmap="gray", vmin=0, vmax=255)
             plt.tight_layout()
-            plt.show()
+            #plt.show()
 
         
         def get_x_y(self, folders, frac_val, frac_test):

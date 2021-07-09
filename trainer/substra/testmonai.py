@@ -1,20 +1,24 @@
 import os
 import torch
+from io import BytesIO
 from monai.networks.nets import DenseNet121
 from monai.transforms import (Activations, AddChannel, AsDiscrete, Compose, LoadImage, RandFlip, RandRotate, RandZoom,
-    ScaleIntensity,
-    ToTensor,
-)
-
+    ScaleIntensity, ToTensor,)
 from monaiopener import MonaiOpener, MedNISTDataset
 from monaialgo import MonaiAlgo
+from substraclient import Client
+from pathlib import Path
+home = str(Path.home())
+print(home)
 
-datapath= "./data/MedNIST"
-folders = os.listdir(datapath)
+datapath= os.path.join(home, "monaifl", "trainer", "MONAI","data")
+datasetName = 'MedNIST'
+data_dir = os.path.join(datapath, datasetName)
+folders = os.listdir(data_dir)
 #modelpath = os.path.join(home, "monaifl", "save","models","client")
-model_dir = "./model/"
+#model_dir = "./model/"
 
-mo = MonaiOpener(datapath)
+mo = MonaiOpener(data_dir)
 print(mo.data_summary(folders))
 train_x, train_y, val_x, val_y, test_x, test_y = mo.get_x_y(folders, 0.1, 0.1)
 print(f"Training count: {len(train_x)}, Validation count: {len(val_x)}, Test count: {len(test_x)}")
@@ -71,7 +75,15 @@ ma.train_loader = train_loader
 ma.val_loader = val_loader
 ma.test_loader = test_loader
 
-# models directory
-ma.model_dir = model_dir
 # training 
-ma.train()
+#checkpoint = ma.train()
+checkpoint = {'epoch': ma.epochs,
+            'model_state_dict': ma.model.state_dict(),
+            'optimizer_state_dict': ma.optimizer.state_dict(),
+            }
+#checkpoint = {1: 1, 2: 4, 3: 9, 4: 16, 5: 25}
+#creating client
+client  = Client("localhost:50051")
+
+#aggregation request
+client.request(ma.model, ma.optimizer, checkpoint)

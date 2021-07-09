@@ -14,6 +14,7 @@ import copy
 
 from reporter import getLocalParameters, setLocalParameters
 
+
 def client():
     channel = grpc.insecure_channel("localhost:50051")
     client = MonaiFLServiceStub(channel)
@@ -31,8 +32,6 @@ def client():
         setLocalParameters(response_bytes)
     else:
         print("Local model not available yet...")
-
-class pack
 
 
 client()
