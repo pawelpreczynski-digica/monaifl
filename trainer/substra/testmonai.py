@@ -78,8 +78,8 @@ ma.test_loader = test_loader
 # training 
 #checkpoint = ma.train()
 checkpoint = {'epoch': ma.epochs,
-            'model_state_dict': ma.model.state_dict(),
-            'optimizer_state_dict': ma.optimizer.state_dict(),
+            'weights': ma.model.state_dict(),
+            'optimizer': ma.optimizer.state_dict()
             }
 #checkpoint = {1: 1, 2: 4, 3: 9, 4: 16, 5: 25}
 #creating client
