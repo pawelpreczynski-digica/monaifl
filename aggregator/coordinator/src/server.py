@@ -4,48 +4,45 @@ import numpy as np
 import grpc
 import monaifl_pb2_grpc
 from monaifl_pb2 import ParamsResponse
-
+from utils import Mapping
 import torch as t
 import copy
-from coordinator import FedAvg, setGlobalParameters 
-import json
+from coordinator import FedAvg
 
 w_loc = []
+request_data = Mapping()
 class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
-    def __init__(self):
-        self.epochs = None
-        self.weights = None
-        self.optimizer = None 
+    
 
     def ParamTransfer(self, request, context):
+        epochs = 0
+        w_glob = list() 
+        optimizer = list()  
         request_bytes = BytesIO(request.para_request)
         request_data = t.load(request_bytes)
-        print('Received Model Updates from Client: ', request_data)
+        print('Received Model Updates (keys): ', request_data.keys())
+      
         print("Aggregating Model...")     
-        if request_data['epoch']:
-            self.epochs = request_data['epoch']
-            print("Best Epoch at Client: " + request_data['epoch'] )
-        elif request_data['weights']:
-            w = request_data['weights']
-            print(w)
-            w_loc.append(copy.deepcopy(w))
-            w_glob = FedAvg(w_loc)
-            self.weights = w_glob
-            print(w_glob)
-        elif request_data['optimizer']:
-            self.optimizer = request_data['optimizer']
-            print("Best Optimizer at Client: " + request_data['optimizer'])
-        else:
-            print('Server does not recognized the sent data')
+        
+        for key in request_data.keys():
+            if key == 'epoch':
+                epochs = request_data['epoch']
+                print("Best Epoch at Client: " + request_data['epoch'] )
+            elif key == 'weights':
+                w = request_data['weights']
+                w_loc.append(copy.deepcopy(w))
+                w_glob = FedAvg(w_loc)
+            elif key == 'optimizer':
+                optimizer = request_data['optimizer']
+            else:
+                print('Server does not recognized the sent data')
         buffer = BytesIO()
-        checkpoint = {'epoch': self.epochs,
-            'weights': self.weights,
-            'optimizer': self.optimizer}
+        checkpoint = {'epoch': epochs,
+            'weights': w_glob,
+            'optimizer': optimizer}
+        #print(checkpoint)
         t.save(checkpoint, buffer)
-        #t.save(w_glob, buffer)
         print("Returning Checkpoint...") 
-        #print(buffer)
-     #   setGlobalParameters(buffer)
         return ParamsResponse(para_response=buffer.getvalue())
  
 def serve():

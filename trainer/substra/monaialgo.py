@@ -39,6 +39,7 @@ class MonaiAlgo(Algo):
         best_metric_epoch = -1
         epoch_loss_values = list()
         metric_values = list()
+
         self.model.to(device)
         for epoch in range(self.epochs):
             print("-" * 10)
@@ -92,7 +93,7 @@ class MonaiAlgo(Algo):
                     f" at epoch: {best_metric_epoch}"
                 )
         checkpoint = Mapping()
-        checkpoint.update(epoch=best_metric_epoch, metric=best_metric, weights=best_model)
+        checkpoint.update(epoch=best_metric_epoch, weights=best_model, metric=best_metric)
         print(f"train completed, best_metric: {best_metric:.4f} at epoch: {best_metric_epoch}")
         return checkpoint
 

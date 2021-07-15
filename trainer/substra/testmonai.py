@@ -7,9 +7,12 @@ from monai.transforms import (Activations, AddChannel, AsDiscrete, Compose, Load
 from monaiopener import MonaiOpener, MedNISTDataset
 from monaialgo import MonaiAlgo
 from substraclient import Client
+from utils import Mapping
+
 from pathlib import Path
 home = str(Path.home())
 print(home)
+
 
 datapath= os.path.join(home, "monaifl", "trainer", "MONAI","data")
 datasetName = 'MedNIST'
@@ -63,7 +66,7 @@ ma.loss_function = torch.nn.CrossEntropyLoss()
 ma.optimizer = torch.optim.Adam(ma.model.parameters(), 1e-5)
 
 # number of epochs
-ma.epochs = 4
+ma.epochs = 1
 
 # training/validation/testing datasets
 ma.train_ds = train_ds
@@ -75,13 +78,11 @@ ma.train_loader = train_loader
 ma.val_loader = val_loader
 ma.test_loader = test_loader
 
-# training 
-#checkpoint = ma.train()
-checkpoint = {'epoch': ma.epochs,
-            'weights': ma.model.state_dict(),
-            'optimizer': ma.optimizer.state_dict()
-            }
-#checkpoint = {1: 1, 2: 4, 3: 9, 4: 16, 5: 25}
+# training and checkpoints
+checkpoint = Mapping()
+checkpoint = ma.train()
+print(checkpoint)
+
 #creating client
 client  = Client("localhost:50051")
 
