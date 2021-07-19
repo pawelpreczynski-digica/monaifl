@@ -4,6 +4,7 @@
  #   import substratools as tools
 import os
 import torch
+import numpy
 from sklearn.metrics import classification_report
 from algo import Algo
 from utils import Mapping
@@ -93,6 +94,7 @@ class MonaiAlgo(Algo):
                     f" at epoch: {best_metric_epoch}"
                 )
         checkpoint = Mapping()
+        #np_arr = torch_tensor
         checkpoint.update(epoch=best_metric_epoch, weights=best_model, metric=best_metric)
         print(f"train completed, best_metric: {best_metric:.4f} at epoch: {best_metric_epoch}")
         return checkpoint

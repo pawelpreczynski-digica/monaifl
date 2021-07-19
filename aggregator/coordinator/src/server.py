@@ -19,7 +19,7 @@ class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
         w_glob = list() 
         optimizer = list()  
         request_bytes = BytesIO(request.para_request)
-        request_data = t.load(request_bytes)
+        request_data = t.load(request_bytes, map_location='cpu')
         print('Received Model Updates (keys): ', request_data.keys())
       
         print("Aggregating Model...")     
@@ -27,13 +27,19 @@ class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
         for key in request_data.keys():
             if key == 'epoch':
                 epochs = request_data['epoch']
-                print("Best Epoch at Client: " + request_data['epoch'] )
+                print("Best Epoch at Client: " + str(request_data['epoch']) )
             elif key == 'weights':
                 w = request_data['weights']
+                print("Copying weights...")
                 w_loc.append(copy.deepcopy(w))
+                print("Aggregating weights...")
                 w_glob = FedAvg(w_loc)
             elif key == 'optimizer':
                 optimizer = request_data['optimizer']
+            elif key == 'metric':
+                epochs = request_data['metric']
+                print("Best metric at Client: " + str(request_data['metric']) )
+            
             else:
                 print('Server does not recognized the sent data')
         buffer = BytesIO()
