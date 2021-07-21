@@ -32,7 +32,7 @@ class Client():
         self.model = None
         self.optimizer = None
 
-    def request(self, model, optim, data):
+    def aggregate(self, model, optim, data):
         self.data = data
         print(self.data.keys())
         buffer = BytesIO()
@@ -55,7 +55,9 @@ class Client():
         t.save(self.model.state_dict(), modelFile)
         print("Model saved... at: "+ modelFile)
      
-    def response(self):
-        print("Connecting and recveing data")
-
+    def bootstrap(self):
+        print("Connecting and recveing initial model checkpoint...")
+        self.data = {"id":"client1"}
+        print(self.data.keys())
+        
 
