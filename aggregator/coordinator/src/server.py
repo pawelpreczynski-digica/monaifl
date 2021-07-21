@@ -1,3 +1,4 @@
+import os
 from concurrent import futures
 from io import BytesIO
 import numpy as np
@@ -9,8 +10,19 @@ import torch as t
 import copy
 from coordinator import FedAvg
 
+from pathlib import Path
+
+home = str(Path.home())
+print(home)
+
+modelpath = os.path.join(home, "monaifl", "save","models","server")
+modelName = "test-monai.pth.tar"
+modelFile = os.path.join(modelpath, modelName)
+
 w_loc = []
 request_data = Mapping()
+whitelist = ["client1"]
+
 class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
     
 
@@ -47,6 +59,7 @@ class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
             'weights': w_glob,
             'optimizer': optimizer}
         #print(checkpoint)
+        t.save(checkpoint, modelFile)
         t.save(checkpoint, buffer)
         print("Returning Checkpoint...") 
         return ParamsResponse(para_response=buffer.getvalue())

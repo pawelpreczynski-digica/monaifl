@@ -6,12 +6,13 @@ message ParamsRequest {
   bytes para_request = 1;  
 }
 
-// normalized training data
+
 message ParamsResponse {  
   bytes para_response = 2;
 }
 
-// service method
+// FL service 
 service MonaiFLService{
   rpc ParamTransfer(ParamsRequest) returns (ParamsResponse);
+  rpc ModelTransfer(ParamRequest) returns (ParamsResponse);
 }

@@ -87,4 +87,4 @@ print(checkpoint)
 client  = Client("localhost:50051")
 
 #aggregation request
-client.request(ma.model, ma.optimizer, checkpoint)
+client.aggregate(ma.model, ma.optimizer, checkpoint)
