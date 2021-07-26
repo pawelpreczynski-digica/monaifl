@@ -78,13 +78,17 @@ ma.train_loader = train_loader
 ma.val_loader = val_loader
 ma.test_loader = test_loader
 
+client  = Client("localhost:50051")
+
+client.bootstrap(ma.model, ma.optimizer)
+
 # training and checkpoints
 checkpoint = Mapping()
 checkpoint = ma.train()
 print(checkpoint)
 
 #creating client
-client  = Client("localhost:50051")
+
 
 #aggregation request
 client.aggregate(ma.model, ma.optimizer, checkpoint)

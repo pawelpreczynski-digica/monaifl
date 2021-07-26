@@ -1,4 +1,12 @@
+from pathlib import Path
+home = str(Path.home())
+#print(home)
 import os
+commonpath = os.path.join(home, "monaifl","common")
+
+import sys
+sys.path.insert(1, commonpath)
+
 from concurrent import futures
 from io import BytesIO
 import numpy as np
@@ -9,14 +17,11 @@ from utils import Mapping
 import torch as t
 import copy
 from coordinator import FedAvg
+import time
 
-from pathlib import Path
-
-home = str(Path.home())
-print(home)
 
 modelpath = os.path.join(home, "monaifl", "save","models","server")
-modelName = "test-monai.pth.tar"
+modelName = "monai-test.pth.tar"
 modelFile = os.path.join(modelpath, modelName)
 
 w_loc = []
@@ -25,7 +30,29 @@ whitelist = ["client1"]
 
 class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
     
-
+    def __init__(self):
+        self.model = None
+        
+    def ModelTransfer(self, request, context):
+        request_bytes = BytesIO(request.para_request)
+        request_data = t.load(request_bytes, map_location='cpu')
+        print('Received Model Request: ', request_data.keys())   
+        buffer = BytesIO()
+        if request_data['id'] in whitelist:
+            print(request_data['id'])
+            self.model = request_data['model']
+            if os.path.isfile(modelFile):
+                print("sending model...") 
+                self.model.load_state_dict(t.load(modelFile))
+                checkpoint = self.model.state_dict() 
+                t.save(checkpoint, buffer)
+            else:
+                print ("initial model does not exist")    
+        else:
+            print("Please contact admin for permissions...")
+        time.sleep(5)
+        return ParamsResponse(para_response=buffer.getvalue())
+    
     def ParamTransfer(self, request, context):
         epochs = 0
         w_glob = list() 
@@ -58,21 +85,21 @@ class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
         checkpoint = {'epoch': epochs,
             'weights': w_glob,
             'optimizer': optimizer}
-        #print(checkpoint)
         t.save(checkpoint, modelFile)
         t.save(checkpoint, buffer)
         print("Returning Checkpoint...") 
         return ParamsResponse(para_response=buffer.getvalue())
  
+
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10),options=[
-               ('grpc.max_send_message_length', 500*1024*1024),
-               ('grpc.max_receive_message_length', 500*1024*1024)])
+               ('grpc.max_send_message_length', 1000*1024*1024),
+               ('grpc.max_receive_message_length', 1000*1024*1024)])
     monaifl_pb2_grpc.add_MonaiFLServiceServicer_to_server(
         MonaiFLService(), server)
     server.add_insecure_port("[::]:50051")
     server.start()
-    print("Waiting for client tensors...")
+    print("Aggregator is up and waiting for workers...")
     server.wait_for_termination()
 
 if __name__ == "__main__":

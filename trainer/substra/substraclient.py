@@ -1,6 +1,12 @@
-# import sys
-# sys.path.insert(0, '/.../common')
-# #trainer/reporter/src/client.py
+from pathlib import Path
+home = str(Path.home())
+print(home)
+import os
+commonpath = os.path.join(home, "monaifl","common")
+
+import sys
+sys.path.insert(1, commonpath)
+
 
 import grpc
 from monaifl_pb2_grpc import MonaiFLServiceStub
@@ -10,15 +16,10 @@ import numpy as np
 import torch as t
 import io
 import os
-import sys
 import copy
 #from reporter import getLocalParameters, setLocalParameters
-from pathlib import Path
-home = str(Path.home())
 
-print(home)
 modelpath = os.path.join(home, "monaifl", "save","models","client")
-#modelName = 'MNIST-test.pth.tar'
 modelName = 'monai-test.pth.tar'
 modelFile = os.path.join(modelpath, modelName)
 
@@ -47,17 +48,30 @@ class Client():
         response_bytes = BytesIO(fl_response.para_response)
         self.model = model
         response = t.load(response_bytes)
-        #print(response)
         self.model.load_state_dict(response['weights'])
         self.optimizer = optim
         self.model.eval()
-        #print(self.model.state_dict())
         t.save(self.model.state_dict(), modelFile)
         print("Model saved... at: "+ modelFile)
      
-    def bootstrap(self):
+    def bootstrap(self, model, optim):
         print("Connecting and recveing initial model checkpoint...")
-        self.data = {"id":"client1"}
+        self.data = {"id":"client1", "model": model}
         print(self.data.keys())
-        
+        buffer = BytesIO()
+        t.save(self.data, buffer)
+        size = buffer.getbuffer().nbytes
+        print(size)
+        opts = [('grpc.max_receive_message_length', size*2), ('grpc.max_send_message_length', size*2), ('grpc.max_message_length', size*2)]
+        self.channel = grpc.insecure_channel(self.address, options = opts)
+        client = MonaiFLServiceStub(self.channel)
+        self.fl_request = ParamsRequest(para_request=buffer.getvalue())
+        fl_response = client.ModelTransfer(self.fl_request)
+        response_bytes = BytesIO(fl_response.para_response)
+        self.model = model
+        self.model.load_state_dict(t.load(response_bytes))
+        self.optimizer = optim
+        self.model.eval()
+        t.save(self.model.state_dict(), modelFile)
+        print("Model saved... at: "+ modelFile)
 

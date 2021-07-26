@@ -1,3 +1,12 @@
+from pathlib import Path
+home = str(Path.home())
+print(home)
+import os
+commonpath = os.path.join(home, "monaifl","common")
+
+import sys
+sys.path.insert(1, commonpath)
+
 import os
 import pandas as pd
 from opener import Opener
