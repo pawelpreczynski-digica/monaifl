@@ -17,7 +17,6 @@ from utils import Mapping
 import torch as t
 import copy
 from coordinator import FedAvg
-import time
 
 
 modelpath = os.path.join(home, "monaifl", "save","models","server")
@@ -43,14 +42,13 @@ class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
             self.model = request_data['model']
             if os.path.isfile(modelFile):
                 print("sending model...") 
-                self.model.load_state_dict(t.load(modelFile))
-                checkpoint = self.model.state_dict() 
-                t.save(checkpoint, buffer)
+                print(modelFile)
+                checkpoint = t.load(modelFile)
+                t.save(checkpoint['weights'], buffer)
             else:
                 print ("initial model does not exist")    
         else:
             print("Please contact admin for permissions...")
-        time.sleep(5)
         return ParamsResponse(para_response=buffer.getvalue())
     
     def ParamTransfer(self, request, context):
@@ -59,9 +57,9 @@ class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
         optimizer = list()  
         request_bytes = BytesIO(request.para_request)
         request_data = t.load(request_bytes, map_location='cpu')
-        print('Received Model Updates (keys): ', request_data.keys())
+        print('Received model updates (keys): ', request_data.keys())
       
-        print("Aggregating Model...")     
+        print("Aggregating model on the server...")     
         
         for key in request_data.keys():
             if key == 'epoch':
@@ -104,3 +102,4 @@ def serve():
 
 if __name__ == "__main__":
     serve()
+
