@@ -1,17 +1,17 @@
 from pathlib import Path
 home = str(Path.home())
-#print(home)
+home ="/home/mhr21/"
+print(home)
 import os
-commonpath = os.path.join(home, "monaifl","common")
-
-import sys
-sys.path.insert(1, commonpath)
+#commonpath = os.path.join(home, "monaifl","common")
+#import sys
+#sys.path.insert(1, commonpath)
 
 from concurrent import futures
 from io import BytesIO
 import numpy as np
 import grpc
-import monaifl_pb2_grpc
+import monaifl_pb2_grpc as monaifl_pb2_grpc
 from monaifl_pb2 import ParamsResponse
 from utils import Mapping
 import torch as t

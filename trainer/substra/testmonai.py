@@ -13,10 +13,8 @@ from pathlib import Path
 home = str(Path.home())
 print(home)
 
-
-datapath= os.path.join(home, "monaifl", "trainer", "MONAI","data")
 datasetName = 'MedNIST'
-data_dir = os.path.join(datapath, datasetName)
+data_dir = os.path.join(home, datasetName)
 folders = os.listdir(data_dir)
 #modelpath = os.path.join(home, "monaifl", "save","models","client")
 #model_dir = "./model/"
@@ -48,13 +46,13 @@ ma.act = Activations(softmax=True)
 ma.to_onehot = AsDiscrete(to_onehot=True, n_classes=mo.num_class)
 
 train_ds = MedNISTDataset(train_x, train_y, train_transforms)
-train_loader = torch.utils.data.DataLoader(train_ds, batch_size=64, shuffle=True, num_workers=2)
+train_loader = torch.utils.data.DataLoader(train_ds, batch_size=256, shuffle=True, num_workers=2)
 
 val_ds = MedNISTDataset(val_x, val_y, val_transforms)
-val_loader = torch.utils.data.DataLoader(val_ds, batch_size=64, num_workers=2)
+val_loader = torch.utils.data.DataLoader(val_ds, batch_size=256, num_workers=2)
 
 test_ds = MedNISTDataset(test_x, test_y, val_transforms)
-test_loader = torch.utils.data.DataLoader(test_ds, batch_size=64, num_workers=2)
+test_loader = torch.utils.data.DataLoader(test_ds, batch_size=256, num_workers=2)
 
 # model initiliatization
 ma.model = DenseNet121(spatial_dims=2, in_channels=1, out_channels=mo.num_class)#.to(device)
@@ -66,7 +64,7 @@ ma.loss_function = torch.nn.CrossEntropyLoss()
 ma.optimizer = torch.optim.Adam(ma.model.parameters(), 1e-5)
 
 # number of epochs
-ma.epochs = 1
+ma.epochs = 10
 
 # training/validation/testing datasets
 ma.train_ds = train_ds

@@ -75,7 +75,8 @@ class MonaiAlgo(Algo):
                     )
                     y_pred = torch.cat([y_pred, self.model(val_images)], dim=0)
                     y = torch.cat([y, val_labels], dim=0)
-                y_onehot = self.to_onehot(y)
+
+                y_onehot = self.to_onehot(y[None, ...]).T
                 y_pred_act = self.act(y_pred)
                 auc_metric = compute_roc_auc(y_pred_act, y_onehot)
                 del y_pred_act, y_onehot
