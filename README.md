@@ -5,7 +5,7 @@ Reference notebook
 
 https://github.com/Project-MONAI/tutorials/blob/master/2d_classification/mednist_tutorial.ipynb
 
-How to run:
+Installation:
  - create conda environment with python 3.8
  - install monai
  - install grpcio
@@ -15,3 +15,24 @@ How to run:
  - install your system compatibl pytorch version
  - install pandas
  - install numpy
+
+How to run:
+
+Run the server:
+ - navigate to source file (currently it is not dockerized)
+   - cd monaifl/aggregator/coordinator/src
+ - run the server
+   - python server.py  
+
+Mount the dataset:
+ This repository contains the demo dataset. If you are cloning this repository, you do not need to mount any dataset. Otherwise, you must execute the cell 5 from the reference notebook, extract the dataset at your preferred location and set the path in testmonai.py 
+
+Run the client:
+ - navigate to source file (the entry point from the client side)
+  - cd monaifl/trainer/substra
+ - run the example
+  - python testmonai.py
+
+CAUTION: The server side code does not require any GPU installation but for the client side you must have a CUDA-enabled device to initiate the training. 
+
+Please feel free to contact me at habibcomsats@gmail.com or mhrehman@ieee.org for any query, feedback, suggestion, or discussion.
