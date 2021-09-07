@@ -14,7 +14,8 @@ home = str(Path.home())
 print(home)
 
 datasetName = 'MedNIST'
-data_dir = os.path.join(home, datasetName)
+data_path = os.path.join(home, "monaifl", "trainer","substra")
+data_dir = os.path.join(data_path, datasetName)
 folders = os.listdir(data_dir)
 #modelpath = os.path.join(home, "monaifl", "save","models","client")
 #model_dir = "./model/"
@@ -76,7 +77,7 @@ ma.train_loader = train_loader
 ma.val_loader = val_loader
 ma.test_loader = test_loader
 
-client  = Client("localhost:50051")
+client = Client("localhost:50051")
 
 client.bootstrap(ma.model, ma.optimizer)
 
@@ -84,9 +85,6 @@ client.bootstrap(ma.model, ma.optimizer)
 checkpoint = Mapping()
 checkpoint = ma.train()
 print(checkpoint)
-
-#creating client
-
 
 #aggregation request
 client.aggregate(ma.model, ma.optimizer, checkpoint)
