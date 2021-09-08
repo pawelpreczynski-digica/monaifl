@@ -1,4 +1,7 @@
 import os
+import sys
+sys.path.append('.')
+
 import torch
 from io import BytesIO
 from monai.networks.nets import DenseNet121
@@ -7,7 +10,7 @@ from monai.transforms import (Activations, AddChannel, AsDiscrete, Compose, Load
 from monaiopener import MonaiOpener, MedNISTDataset
 from monaialgo import MonaiAlgo
 from substraclient import Client
-from utils import Mapping
+from common.utils import Mapping
 
 from pathlib import Path
 home = str(Path.home())
@@ -47,13 +50,13 @@ ma.act = Activations(softmax=True)
 ma.to_onehot = AsDiscrete(to_onehot=True, n_classes=mo.num_class)
 
 train_ds = MedNISTDataset(train_x, train_y, train_transforms)
-train_loader = torch.utils.data.DataLoader(train_ds, batch_size=256, shuffle=True, num_workers=2)
+train_loader = torch.utils.data.DataLoader(train_ds, batch_size=1024, shuffle=True, num_workers=2)
 
 val_ds = MedNISTDataset(val_x, val_y, val_transforms)
-val_loader = torch.utils.data.DataLoader(val_ds, batch_size=256, num_workers=2)
+val_loader = torch.utils.data.DataLoader(val_ds, batch_size=1024, num_workers=2)
 
 test_ds = MedNISTDataset(test_x, test_y, val_transforms)
-test_loader = torch.utils.data.DataLoader(test_ds, batch_size=256, num_workers=2)
+test_loader = torch.utils.data.DataLoader(test_ds, batch_size=1024, num_workers=2)
 
 # model initiliatization
 ma.model = DenseNet121(spatial_dims=2, in_channels=1, out_channels=mo.num_class)#.to(device)
@@ -65,7 +68,7 @@ ma.loss_function = torch.nn.CrossEntropyLoss()
 ma.optimizer = torch.optim.Adam(ma.model.parameters(), 1e-5)
 
 # number of epochs
-ma.epochs = 10
+ma.epochs = 1
 
 # training/validation/testing datasets
 ma.train_ds = train_ds

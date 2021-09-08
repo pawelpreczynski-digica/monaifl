@@ -1,16 +1,14 @@
 from pathlib import Path
 home = str(Path.home())
 print(home)
+
 import os
-commonpath = os.path.join(home, "monaifl","common")
-
 import sys
-sys.path.insert(1, commonpath)
-
+sys.path.append('.')
 
 import grpc
-from monaifl_pb2_grpc import MonaiFLServiceStub
-from monaifl_pb2 import ParamsRequest
+from common.monaifl_pb2_grpc import MonaiFLServiceStub
+from common.monaifl_pb2 import ParamsRequest
 from io import BytesIO
 import numpy as np
 import torch as t

@@ -1,23 +1,20 @@
 from pathlib import Path
 home = str(Path.home())
-home ="/home/mhr21/"
 print(home)
 import os
-#commonpath = os.path.join(home, "monaifl","common")
-#import sys
-#sys.path.insert(1, commonpath)
+import sys
+sys.path.append('.')
 
 from concurrent import futures
 from io import BytesIO
 import numpy as np
 import grpc
-import monaifl_pb2_grpc as monaifl_pb2_grpc
-from monaifl_pb2 import ParamsResponse
-from utils import Mapping
+from common import monaifl_pb2_grpc as monaifl_pb2_grpc
+from common.monaifl_pb2 import ParamsResponse
+from aggregator.coordinator.src.coordinator import FedAvg
+from common.utils import Mapping
 import torch as t
 import copy
-from coordinator import FedAvg
-
 
 modelpath = os.path.join(home, "monaifl", "save","models","server")
 modelName = "monai-test.pth.tar"

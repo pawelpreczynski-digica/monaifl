@@ -3,8 +3,12 @@ import logging
 import os
 import types
 
-import utils, exceptions
+import common.utils as utils
+import common.exceptions as exceptions
 from workspace import OpenerWorkspace
+
+import sys
+sys.path.append('.')
 
 logger = logging.getLogger(__name__)
 

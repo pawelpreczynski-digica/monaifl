@@ -5,13 +5,25 @@ Reference notebook
 
 https://github.com/Project-MONAI/tutorials/blob/master/2d_classification/mednist_tutorial.ipynb
 
-How to run:
+How to Install:
  - create conda environment with python 3.8
  - install monai
  - install grpcio
  - install grpc with python compiler
     - python -m pip install grpcio
     - python -m pip install grpcio-tools
- - install your system compatibl pytorch version
+ - install your system compatible pytorch version
  - install pandas
  - install numpy
+
+Running Server:
+1. Open a new terminal
+2. activate conda environment
+3. $ cd monaifl
+4. $monaifl/python aggregator/coordinator/src/server.py
+
+Running Client:
+1. Open a new terminal
+2. activate conda environment
+3. cd monaifl 
+4. python trainer/substra/testmonai.py

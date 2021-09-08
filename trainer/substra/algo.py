@@ -4,8 +4,10 @@ import argparse
 import logging
 import os
 import sys
+sys.path.append('.')
 
-import opener, utils, exceptions
+from common import utils, exceptions
+from trainer.substra import opener 
 from workspace import (AlgoWorkspace, CompositeAlgoWorkspace,
                                     AggregateAlgoWorkspace)
 

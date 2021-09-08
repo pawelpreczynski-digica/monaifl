@@ -2,14 +2,13 @@ from pathlib import Path
 home = str(Path.home())
 print(home)
 import os
-commonpath = os.path.join(home, "monaifl","common")
 
 import sys
-sys.path.insert(1, commonpath)
+sys.path.append('.')
 
 import os
 import pandas as pd
-from opener import Opener
+from trainer.substra.opener import Opener
 import PIL
 import numpy as np
 import matplotlib.pyplot as plt

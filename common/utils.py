@@ -4,8 +4,9 @@ import inspect
 import logging
 import os
 import sys
+sys.path.append('.')
 
-import exceptions
+import common.exceptions as exceptions
 
 
 logger = logging.getLogger(__name__)

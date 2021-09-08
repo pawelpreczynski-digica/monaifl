@@ -1,13 +1,12 @@
-# Example
+import sys
+sys.path.append('.')
 
- #   import json
- #   import substratools as tools
 import os
 import torch
 import numpy
 from sklearn.metrics import classification_report
-from algo import Algo
-from utils import Mapping
+from trainer.substra.algo import Algo
+from common.utils import Mapping
 from monai.metrics import compute_roc_auc
 
 from monai.utils import set_determinism
