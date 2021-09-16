@@ -31,11 +31,11 @@
 
 <!-- PROJECT LOGO -->
 <br />
-<p align="center">
+<!--<p align="center">
   <a href="https://github.com/habibcomsats/monaifl">
     <img src="images/logo.png" alt="Logo" width="120" height="80">
   </a>
-
+-->
   <h3 align="center">MONAI-FL</h3>
 
   <p align="center">
@@ -115,7 +115,10 @@ To get a local copy up and running follow these simple steps.
 
 ### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
+Following platforms are neccessary to run this project.
+* Linux Installation (preferably Ubuntu distributions)
+  For other OS, you can try and share your experience with us :-)    
+
 * install visual studio code
   ```sh
   https://code.visualstudio.com/docs/setup/linux
