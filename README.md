@@ -89,7 +89,7 @@
 MONAI-FL is planned to be a tool-agnostic federated learning platform for medical imaging applications. We envision the below-mentioned architecture for our code-base, however, please feel free to modify the code-base considering your own application requirements.
 </p>
 <p align="center">
-<img src="images/monaifl.png" alt="MONAI-FL" width="480" height="320" align="center">
+<img src="images/monaifl.png" alt="MONAI-FL" width="1280" height="720" align="center">
 </p>
 <!--
 Here's a blank template to get started:
