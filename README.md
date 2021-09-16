@@ -116,8 +116,7 @@ To get a local copy up and running follow these simple steps.
 ### Prerequisites
 
 Following platforms are neccessary to run this project.
-* Linux Installation (preferably Ubuntu distributions)
-  For other OS, you can try and share your experience with us :-)    
+* Linux Installation (preferably Ubuntu distributions). [For other Operating Systems, you can try and share your experience with us :-)]   
 
 * install visual studio code
   ```sh
