@@ -229,9 +229,9 @@ Project Link: [https://github.com/habibcomsats/monaifl](https://github.com/habib
 <!-- ACKNOWLEDGEMENTS -->
 ## Acknowledgements
 
-* [AMIGO]()
-* [AnswerDigital]()
-* [FLIP]()
+* [AMIGO](https://github.com/AmigoLab)
+* [AnswerDigital](https://answerdigital.com/)
+* [AI Center for Value-Based Healthcare](https://www.aicentre.co.uk/)
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
