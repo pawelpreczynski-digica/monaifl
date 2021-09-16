@@ -175,15 +175,25 @@ Mount the dataset:
 Running Server:
 1. Open a new terminal
 2. activate conda environment
-3. $ cd monaifl (currently it is not dockerized)
-4. $monaifl/python aggregator/coordinator/src/server.py
-
+3. Navigate into code repository (currently it is not dockerized)
+  ```sh
+  $ cd monaifl
+  ```
+4. Run the server@($monaifl/)
+  ```sh
+    python aggregator/coordinator/src/server.py
+  ```
 Running Client:
 1. Open a new terminal
 2. activate conda environment
-3. cd monaifl 
-4. python trainer/substra/testmonai.py
-
+3. Navigate into code repository (currently it is not dockerized)
+  ```sh
+  $ cd monaifl
+  ```
+4. Run the client@($monaifl/)
+  ```sh
+  python trainer/substra/testmonai.py
+  ```
 CAUTION: The server side code does not require any GPU installation but for the client side you must have a CUDA-enabled device to initiate the training. 
 
 <!-- ROADMAP -->
