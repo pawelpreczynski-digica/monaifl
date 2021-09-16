@@ -176,7 +176,7 @@ Mount the dataset:
 
 Running Server:
 1. Open a new terminal
-2. activate conda environment
+2. Activate conda environment
 3. Navigate into code repository (currently it is not dockerized)
   ```sh
   $ cd monaifl
@@ -187,7 +187,7 @@ Running Server:
   ```
 Running Client:
 1. Open a new terminal
-2. activate conda environment
+2. Activate conda environment
 3. Navigate into code repository (currently it is not dockerized)
   ```sh
   $ cd monaifl
