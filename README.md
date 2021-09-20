@@ -20,27 +20,27 @@
 *** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
 *** https://www.markdownguide.org/basic-syntax/#reference-style-links
 -->
-[![Contributors][contributors-shield]][contributors-url]
+<!--[![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
-
+-->
 
 
 <!-- PROJECT LOGO -->
 <br />
-<p align="center">
-  <a href="https://github.com/github_username/repo_name">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+<!--<p align="center">
+  <a href="https://github.com/habibcomsats/monaifl">
+    <img src="images/logo.png" alt="Logo" width="120" height="80">
   </a>
-
-  <h3 align="center">project_title</h3>
+-->
+  <h3 align="center">MONAI-FL</h3>
 
   <p align="center">
-    project_description
-    <br />
+    This repository contains the basic federated learning example of monai code considering substra's opener and algo classes.
+    <!--<br />
     <a href="https://github.com/github_username/repo_name"><strong>Explore the docs »</strong></a>
     <br />
     <br />
@@ -50,6 +50,7 @@
     ·
     <a href="https://github.com/github_username/repo_name/issues">Request Feature</a>
   </p>
+    -->
 </p>
 
 
@@ -84,19 +85,26 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
-
+<p align="left">
+MONAI-FL is planned to be a tool-agnostic federated learning platform for medical imaging applications. We envision the below-mentioned architecture for our code-base, however, please feel free to modify the code-base considering your own application requirements.
+</p>
+<p align="center">
+<img src="images/monaifl.png" alt="MONAI-FL" width="1280" height="720" align="center">
+</p>
+<!--
 Here's a blank template to get started:
 **To avoid retyping too much info. Do a search and replace with your text editor for the following:**
 `github_username`, `repo_name`, `twitter_handle`, `email`, `project_title`, `project_description`
-
+-->
 
 ### Built With
 
-* []()
-* []()
-* []()
+* [Python 3.8](https://www.python.org/downloads/release/python-380/)
+* [Google gRPC](https://grpc.io/)
+* [Project MONAI](https://monai.io/)
+* [Pytorch](https://pytorch.org/get-started/locally/)
+* [Conda](https://docs.conda.io/en/latest/)
+* [Ubuntu](https://ubuntu.com/)
 
 
 
@@ -107,39 +115,93 @@ To get a local copy up and running follow these simple steps.
 
 ### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
-* npm
+Following platforms are neccessary to run this project.
+* Linux Installation (preferably Ubuntu distributions). [For other Operating Systems, you can try and share your experience with us :-)]   
+
+* install visual studio code
   ```sh
-  npm install npm@latest -g
+  https://code.visualstudio.com/docs/setup/linux
+  ```
+* install conda environment
+  ```sh
+  https://docs.conda.io/en/latest/
   ```
 
 ### Installation
 
 1. Clone the repo
    ```sh
-   git clone https://github.com/github_username/repo_name.git
+   git clone https://github.com/habibcomsats/monaifl.git
    ```
-2. Install NPM packages
+2. Create conda environment
    ```sh
-   npm install
+   conda create -n monaifl python=3
    ```
-
-
-
+3. Activate conda environment
+   ```sh
+   conda activate monaifl
+   ```
+4. Install your system compatible pytorch version
+   ```sh
+   https://pytorch.org/get-started/locally/
+   ```
+5. Install MONAI with Nibabel and TQDM
+  ```sh
+  https://docs.monai.io/en/latest/installation.html
+  ```
+6. Install grpc with python compiler
+  ```sh
+  python -m pip install grpcio
+  ```
+  ```sh
+  python -m pip install grpcio-tools
+  ```
+7. Install Pandas
+  ```sh
+  conda install pandas
+  ```
+9. Install Numpy
+  ```sh
+  conda install numpy
+  ```
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+Reference notebook
 
-_For more examples, please refer to the [Documentation](https://example.com)_
+https://github.com/Project-MONAI/tutorials/blob/master/2d_classification/mednist_tutorial.ipynb
 
+Mount the dataset:
+ This repository contains the demo dataset. If you are cloning this repository, you do not need to mount any dataset. Otherwise, you must execute the cell 5 from the reference notebook, extract the dataset at your preferred location and set the path in testmonai.py 
 
+Running Server:
+1. Open a new terminal
+2. Activate conda environment
+3. Navigate into code repository (currently it is not dockerized)
+  ```sh
+  $ cd monaifl
+  ```
+4. Run the server@($monaifl/)
+  ```sh
+    python aggregator/coordinator/src/server.py
+  ```
+Running Client:
+1. Open a new terminal
+2. Activate conda environment
+3. Navigate into code repository (currently it is not dockerized)
+  ```sh
+  $ cd monaifl
+  ```
+4. Run the client@($monaifl/)
+  ```sh
+  python trainer/substra/testmonai.py
+  ```
+CAUTION: The server side code does not require any GPU installation but for the client side you must have a CUDA-enabled device to initiate the training. 
 
 <!-- ROADMAP -->
 ## Roadmap
 
-See the [open issues](https://github.com/github_username/repo_name/issues) for a list of proposed features (and known issues).
-
+See the [open issues](https://github.com/habibcomsats/monaifl/issues) for a list of proposed features (and known issues).
 
 
 <!-- CONTRIBUTING -->
@@ -153,38 +215,29 @@ Contributions are what make the open source community such an amazing place to l
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-
-
 <!-- LICENSE -->
 ## License
 
 Distributed under the MIT License. See `LICENSE` for more information.
 
-
-
 <!-- CONTACT -->
 ## Contact
+Habib Rehman - [@habibcomsats](https://twitter.com/habibcomsats) - email (habibcomsats@gmail.com or mhrehman@ieee.org)
 
-Your Name - [@twitter_handle](https://twitter.com/twitter_handle) - email
-
-Project Link: [https://github.com/github_username/repo_name](https://github.com/github_username/repo_name)
+Project Link: [https://github.com/habibcomsats/monaifl](https://github.com/habibcomsats/monaifl)
 
 
 
 <!-- ACKNOWLEDGEMENTS -->
 ## Acknowledgements
 
-* []()
-* []()
-* []()
-
-
-
-
+* [AMIGO](https://github.com/AmigoLab)
+* [AnswerDigital](https://answerdigital.com/)
+* [AI Center for Value-Based Healthcare](https://www.aicentre.co.uk/)
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/github_username/repo.svg?style=for-the-badge
+<!--[contributors-shield]: https://img.shields.io/github/contributors/github_username/repo.svg?style=for-the-badge
 [contributors-url]: https://github.com/github_username/repo_name/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/github_username/repo.svg?style=for-the-badge
 [forks-url]: https://github.com/github_username/repo_name/network/members
@@ -196,42 +249,4 @@ Project Link: [https://github.com/github_username/repo_name](https://github.com/
 [license-url]: https://github.com/github_username/repo_name/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/github_username
-
-
-
-# fl-architecture
-This repository contains the basic example of monai code considering substra's opener and algo classes.
-
-Reference notebook
-
-https://github.com/Project-MONAI/tutorials/blob/master/2d_classification/mednist_tutorial.ipynb
-
-How to Install:
- - create conda environment with python 3.8
- - install monai
- - install grpcio
- - install grpc with python compiler
-    - python -m pip install grpcio
-    - python -m pip install grpcio-tools
- - install your system compatible pytorch version
- - install pandas
- - install numpy
-
-Mount the dataset:
- This repository contains the demo dataset. If you are cloning this repository, you do not need to mount any dataset. Otherwise, you must execute the cell 5 from the reference notebook, extract the dataset at your preferred location and set the path in testmonai.py 
-
-Running Server:
-1. Open a new terminal
-2. activate conda environment
-3. $ cd monaifl (currently it is not dockerized)
-4. $monaifl/python aggregator/coordinator/src/server.py
-
-Running Client:
-1. Open a new terminal
-2. activate conda environment
-3. cd monaifl 
-4. python trainer/substra/testmonai.py
-
-CAUTION: The server side code does not require any GPU installation but for the client side you must have a CUDA-enabled device to initiate the training. 
-
-Please feel free to contact me at habibcomsats@gmail.com or mhrehman@ieee.org for any query, feedback, suggestion, or discussion.
+-->
