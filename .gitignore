@@ -1,3 +1,7 @@
 venv
 MONAI
 datasets
+save/models/client/*
+!save/models/client/README.md
+save/models/server/*
+!save/models/server/README.md
