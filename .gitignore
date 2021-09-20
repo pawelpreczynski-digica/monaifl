@@ -1,6 +1,10 @@
+*.pyc
+__pycache__/
+
 venv
 MONAI
-datasets
+datasets/*/
+datasets/.*
 save/models/client/*
 !save/models/client/README.md
 save/models/server/*
