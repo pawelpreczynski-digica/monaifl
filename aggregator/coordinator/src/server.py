@@ -1,6 +1,6 @@
 from pathlib import Path
-home = str(Path.home())
-print(home)
+cwd = str(Path.cwd())
+print(cwd)
 import os
 import sys
 sys.path.append('.')
@@ -16,7 +16,7 @@ from common.utils import Mapping
 import torch as t
 import copy
 
-modelpath = os.path.join(home, "monaifl", "save","models","server")
+modelpath = os.path.join(cwd, "save","models","server")
 modelName = "monai-test.pth.tar"
 modelFile = os.path.join(modelpath, modelName)
 
@@ -43,7 +43,8 @@ class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
                 checkpoint = t.load(modelFile)
                 t.save(checkpoint['weights'], buffer)
             else:
-                print ("initial model does not exist")    
+                print("initial model does not exist, initializing and sending a new one...")
+                t.save(self.model.state_dict(), buffer)
         else:
             print("Please contact admin for permissions...")
         return ParamsResponse(para_response=buffer.getvalue())
