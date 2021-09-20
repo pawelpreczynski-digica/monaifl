@@ -14,7 +14,7 @@ from common.utils import Mapping
 
 from pathlib import Path
 home = str(Path.home())
-print(home)
+print("Project Root Directory: "+ home)
 
 datasetName = 'MedNIST'
 data_path = os.path.join(home, "monaifl", "trainer","substra")
@@ -24,10 +24,15 @@ folders = os.listdir(data_dir)
 #model_dir = "./model/"
 
 mo = MonaiOpener(data_dir)
+print("----------------------------")
+print("Dataset Summary")
+print("----------------------------")
 print(mo.data_summary(folders))
 train_x, train_y, val_x, val_y, test_x, test_y = mo.get_x_y(folders, 0.1, 0.1)
 print(f"Training count: {len(train_x)}, Validation count: {len(val_x)}, Test count: {len(test_x)}")
 
+# getting class names
+class_names = mo.class_names
 ##transforms
 train_transforms = Compose(
     [
@@ -87,7 +92,12 @@ client.bootstrap(ma.model, ma.optimizer)
 # training and checkpoints
 checkpoint = Mapping()
 checkpoint = ma.train()
-print(checkpoint)
+#print(checkpoint)
 
 #aggregation request
 client.aggregate(ma.model, ma.optimizer, checkpoint)
+report = Mapping()
+report = ma.predict(ma.model, class_names)
+
+#performs testing on the test dataset and then reports back the summary of training
+client.report(report)

@@ -85,6 +85,19 @@ class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
         print("Returning Checkpoint...") 
         return ParamsResponse(para_response=buffer.getvalue())
  
+    def ReportTransfer(self, request, context):
+        request_bytes = BytesIO(request.para_request)
+        request_data = t.load(request_bytes, map_location='cpu')
+        print('Received Model Report: ', request_data.keys())   
+        buffer = BytesIO()
+        if request_data['report']:
+            print(request_data['report'])
+            request_data.update(reply="Thanks for reporting test statistics")
+        else:
+            print("No test statistics were reported...")
+            request_data.update(reply="Server was expecting test statistics but nothing received yet")
+        t.save(request_data['reply'], buffer)
+        return ParamsResponse(para_response=buffer.getvalue())
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10),options=[

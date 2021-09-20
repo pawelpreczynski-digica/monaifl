@@ -1,6 +1,6 @@
 from pathlib import Path
 home = str(Path.home())
-print(home)
+#print(home)
 import os
 
 import sys
@@ -18,16 +18,17 @@ class MonaiOpener(Opener):
         def __init__(self, data_dir, num_class=0):
             self.data_dir = data_dir
             self.num_class = num_class
+            self.class_names = None
 
         def data_summary(self, folders):
-            class_names = folders
-            self.num_class = len(class_names)
-            print("Root Directory (dataset): " + self.data_dir)
+            self.class_names = folders
+            self.num_class = len(self.class_names)
+            #print("Root Directory (dataset): " + self.data_dir)
            
             image_files = [
                 [
-                    os.path.join(self.data_dir, class_names[i], x)
-                    for x in os.listdir(os.path.join(self.data_dir, class_names[i]))
+                    os.path.join(self.data_dir, self.class_names[i], x)
+                    for x in os.listdir(os.path.join(self.data_dir, self.class_names[i]))
                 ]
                 for i in range(self.num_class)
             ]
@@ -42,7 +43,7 @@ class MonaiOpener(Opener):
 
             print(f"Total image count: {num_total}")
             print(f"Image dimensions: {image_width} x {image_height}")
-            print(f"Label names: {class_names}")
+            print(f"Label names: {self.class_names}")
             print(f"Label counts: {num_each}")
 
             plt.subplots(3, 3, figsize=(8, 8))
@@ -50,7 +51,7 @@ class MonaiOpener(Opener):
                 im = PIL.Image.open(image_files_list[k])
                 arr = np.array(im)
                 plt.subplot(3, 3, i + 1)
-                plt.xlabel(class_names[image_class[k]])
+                plt.xlabel(self.class_names[image_class[k]])
                 plt.imshow(arr, cmap="gray", vmin=0, vmax=255)
             plt.tight_layout()
             #plt.show()
@@ -64,14 +65,14 @@ class MonaiOpener(Opener):
             test_x = list()
             test_y = list()
             
-            class_names = folders
-            self.num_class = len(class_names)
-            print("Root Directory (dataset): " + self.data_dir)
+            self.class_names = folders
+            self.num_class = len(self.class_names)
+            #print("Root Directory (dataset): " + self.data_dir)
             
             image_files = [
                 [
-                    os.path.join(self.data_dir, class_names[i], x)
-                    for x in os.listdir(os.path.join(self.data_dir, class_names[i]))
+                    os.path.join(self.data_dir, self.class_names[i], x)
+                    for x in os.listdir(os.path.join(self.data_dir, self.class_names[i]))
                 ]
                 for i in range(self.num_class)
             ]

@@ -1,0 +1,21 @@
+We had a quick session to discuss the requirements we would need to include in the FL 
+code you are writing before we could get it into FLIP, here's a quick breakdown:
+
+ - modify the 'compute plan' functionality to include test (at the client) 
+   and aggregation (at the server) steps after the current train (client) 
+   and aggregate (server) steps
+ - include the results from these 'test' and 'aggregation' steps in the output file
+ - log the start and finish of each step at the client and server, along with any errors
+ - implement a callback once the full 'compute plan' has finished, so we can advise out
+   to researchers
+ - containerise the code for deployment in Kubernetes
+ - ensure all metrics from client and server steps are included in output file
+
+Jim / me are hoping to get this into a nice diagram with further details so we can define
+testing steps but for now, can you say if you would be able to implement the above 
+requirements? and if so, a rough estimate of how long it might take? our deadline 
+for code complete on FLIP is end of October, is this realistic?
+
+We'll work on getting more detail around the requirements and drawing some useful diagrams.
+
+Any questions, please ask!
