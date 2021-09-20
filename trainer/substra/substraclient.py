@@ -1,6 +1,6 @@
 from pathlib import Path
-home = str(Path.home())
-print(home)
+cwd = str(Path.cwd())
+print(cwd)
 
 import os
 import sys
@@ -17,7 +17,7 @@ import os
 import copy
 #from reporter import getLocalParameters, setLocalParameters
 
-modelpath = os.path.join(home, "monaifl", "save","models","client")
+modelpath = os.path.join(cwd, "save","models","client")
 modelName = 'monai-test.pth.tar'
 modelFile = os.path.join(modelpath, modelName)
 
@@ -33,7 +33,7 @@ class Client():
 
      
     def bootstrap(self, model, optim):
-        print("Connecting and recveing initial model checkpoint...")
+        print("Connecting and receveing initial model checkpoint...")
         self.data = {"id":"client1", "model": model}
         print(self.data.keys())
         buffer = BytesIO()
