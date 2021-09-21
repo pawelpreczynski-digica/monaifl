@@ -15,4 +15,5 @@ message ParamsResponse {
 service MonaiFLService{
   rpc ParamTransfer(ParamsRequest) returns (ParamsResponse);
   rpc ModelTransfer(ParamsRequest) returns (ParamsResponse);
+  rpc ReportTransfer(ParamsRequest) returns (ParamsResponse);
 }
