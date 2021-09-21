@@ -3,7 +3,9 @@ sys.path.append('.')
 
 import os
 import torch
+from sklearn.metrics import classification_report
 from trainer.substra.algo import Algo
+from trainer.substra.substraclient import Client
 from common.utils import Mapping
 from monai.inferers import sliding_window_inference
 from monai.data import decollate_batch
@@ -13,6 +15,8 @@ from monai.transforms import (
     Compose,
     EnsureType
 )
+
+DEVICE = "cpu"
 
 
 class MonaiAlgo(Algo):
@@ -38,7 +42,7 @@ class MonaiAlgo(Algo):
     def train(self):
         # """## Set deterministic training for reproducibility"""
         set_determinism(seed=0)
-        device = torch.device("cpu")
+        device = torch.device(DEVICE)
         val_interval = 2
         best_metric = -1
         best_metric_epoch = -1
@@ -117,13 +121,39 @@ class MonaiAlgo(Algo):
         print(f"train completed, best_metric: {best_metric:.4f} at epoch: {best_metric_epoch}")
         return checkpoint
 
-    def predict(self, X, model):
-        predictions = 0
-        return predictions
 
-    def load_model(self, path):
-        return NotImplemented  # json.load(path)
+    def load_model(self):
+        client = Client("localhost:50051")
+        path = client.modelFile
+        self.model.load_state_dict(torch.load(path))
+        print("model loaded and creating report...")
 
     def save_model(self, model, path):
         pass
         # json.dump(model, path)
+
+    def predict(self, model, class_names):
+        set_determinism(seed=0)
+        device = torch.device(DEVICE) 
+        self.load_model()
+        self.model.to(device)
+        self.model.eval()
+
+        y_true = []
+        y_pred = []
+        with torch.no_grad():
+            for test_data in self.test_loader:
+                test_images, test_labels = (
+                    test_data[0].to(device),
+                    test_data[1].to(device),
+                )
+                pred = model(test_images).argmax(dim=1)
+                for i in range(len(pred)):
+                    y_true.append(test_labels[i].item())
+                    y_pred.append(pred[i].item())
+
+        test_report = Mapping()
+        test_report.update(report=classification_report(
+        y_true, y_pred, target_names=class_names, digits=4))
+
+        return test_report 

@@ -46,11 +46,15 @@ if __name__ == '__main__':
     #model_dir = "./model/"
 
     mo = MonaiOpener(data_dir)
+    # print("----------------------------")
+    # print("Dataset Summary")
+    # print("----------------------------")
     # print(mo.data_summary(folders))
     # train, val, test = mo.get_x_y()
     train, val = mo.get_x_y()
     # print(f"Training count: {len(train)}, Validation count: {len(val)}, Test count: {len(test)}")
 
+    class_names = mo.class_names
     ##transforms
     train_transforms = Compose(
         [
@@ -155,3 +159,8 @@ if __name__ == '__main__':
 
     #aggregation request
     client.aggregate(ma.model, ma.optimizer, checkpoint)
+    report = Mapping()
+    report = ma.predict(ma.model, class_names)
+
+    #performs testing on the test dataset and then reports back the summary of training
+    client.report(report)
