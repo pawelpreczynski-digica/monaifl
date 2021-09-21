@@ -89,4 +89,4 @@ class Client():
         fl_response = client.ReportTransfer(self.fl_request)
         response_bytes = BytesIO(fl_response.para_response)
         response_data = t.load(response_bytes, map_location='cpu')
-        print('Received Server Report: ', response_data)    
+        print('Received Server Report: ', response_data)   

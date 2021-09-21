@@ -5,6 +5,7 @@ import os
 import torch
 from sklearn.metrics import classification_report
 from trainer.substra.algo import Algo
+from trainer.substra.substraclient import Client
 from common.utils import Mapping
 from monai.metrics import compute_roc_auc
 from monai.utils import set_determinism
@@ -129,9 +130,9 @@ class MonaiAlgo(Algo):
                 for i in range(len(pred)):
                     y_true.append(test_labels[i].item())
                     y_pred.append(pred[i].item())
-
+            
         test_report = Mapping()
         test_report.update(report=classification_report(
         y_true, y_pred, target_names=class_names, digits=4))
-
-        return test_report 
+        
+        return test_report

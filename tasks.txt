@@ -1,4 +1,3 @@
-
  - modify the 'compute plan' functionality to include test (at the client) 
    and aggregation (at the server) steps after the current train (client) 
    and aggregate (server) steps
