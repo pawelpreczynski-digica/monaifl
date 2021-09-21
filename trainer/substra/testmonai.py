@@ -9,28 +9,8 @@ from monai.transforms import (Activations, AddChannel, AsDiscrete, Compose, Load
     ScaleIntensity, ToTensor,)
 from monaiopener import MonaiOpener, MedNISTDataset
 from monaialgo import MonaiAlgo
-from monai.networks.layers import Norm
-from monai.data import CacheDataset, DataLoader, Dataset, decollate_batch
-from monai.networks.nets import UNet
-from monai.metrics import DiceMetric
-from monai.losses import DiceLoss
 from substraclient import Client
 from common.utils import Mapping
-from monai.transforms import (
-    AsDiscrete,
-    AsDiscreted,
-    EnsureChannelFirstd,
-    Compose,
-    CropForegroundd,
-    LoadImaged,
-    Orientationd,
-    RandCropByPosNegLabeld,
-    ScaleIntensityRanged,
-    Spacingd,
-    EnsureTyped,
-    EnsureType,
-    Invertd,
-)
 
 from pathlib import Path
 
@@ -38,115 +18,74 @@ if __name__ == '__main__':
     cwd = Path.cwd()
     print(cwd)
 
-    datasetName = 'Task09_Spleen'
-    data_path = os.path.join(cwd, 'datasets')
+    datasetName = 'MedNIST'
+    data_path = os.path.join(cwd, "trainer", "substra")
     data_dir = os.path.join(data_path, datasetName)
     folders = os.listdir(data_dir)
     #modelpath = os.path.join(home, "monaifl", "save","models","client")
     #model_dir = "./model/"
 
     mo = MonaiOpener(data_dir)
-    # print("----------------------------")
-    # print("Dataset Summary")
-    # print("----------------------------")
-    # print(mo.data_summary(folders))
-    # train, val, test = mo.get_x_y()
-    train, val = mo.get_x_y()
-    # print(f"Training count: {len(train)}, Validation count: {len(val)}, Test count: {len(test)}")
+    print("----------------------------")
+    print("Dataset Summary")
+    print("----------------------------")
+    print(mo.data_summary(folders))
+    train_x, train_y, val_x, val_y, test_x, test_y = mo.get_x_y(folders, 0.1, 0.1)
+    print(f"Training count: {len(train_x)}, Validation count: {len(val_x)}, Test count: {len(test_x)}")
 
+    # getting class names
     class_names = mo.class_names
     ##transforms
     train_transforms = Compose(
         [
-            LoadImaged(keys=["image", "label"]),
-            EnsureChannelFirstd(keys=["image", "label"]),
-            Spacingd(keys=["image", "label"], pixdim=(
-                1.5, 1.5, 2.0), mode=("bilinear", "nearest")),
-            Orientationd(keys=["image", "label"], axcodes="RAS"),
-            ScaleIntensityRanged(
-                keys=["image"], a_min=-57, a_max=164,
-                b_min=0.0, b_max=1.0, clip=True,
-            ),
-            CropForegroundd(keys=["image", "label"], source_key="image"),
-            RandCropByPosNegLabeld(
-                keys=["image", "label"],
-                label_key="label",
-                spatial_size=(96, 96, 96),
-                pos=1,
-                neg=1,
-                num_samples=4,
-                image_key="image",
-                image_threshold=0,
-            ),
-            # user can also add other random transforms
-            # RandAffined(
-            #     keys=['image', 'label'],
-            #     mode=('bilinear', 'nearest'),
-            #     prob=1.0, spatial_size=(96, 96, 96),
-            #     rotate_range=(0, 0, np.pi/15),
-            #     scale_range=(0.1, 0.1, 0.1)),
-            EnsureTyped(keys=["image", "label"]),
+            LoadImage(image_only=True),
+            AddChannel(),
+            ScaleIntensity(),
+            RandRotate(range_x=15, prob=0.5, keep_size=True),
+            RandFlip(spatial_axis=0, prob=0.5),
+            RandZoom(min_zoom=0.9, max_zoom=1.1, prob=0.5),
+            ToTensor(),
         ]
     )
 
-    val_transforms = Compose(
-        [
-            LoadImaged(keys=["image", "label"]),
-            EnsureChannelFirstd(keys=["image", "label"]),
-            Spacingd(keys=["image", "label"], pixdim=(
-                1.5, 1.5, 2.0), mode=("bilinear", "nearest")),
-            Orientationd(keys=["image", "label"], axcodes="RAS"),
-            ScaleIntensityRanged(
-                keys=["image"], a_min=-57, a_max=164,
-                b_min=0.0, b_max=1.0, clip=True,
-            ),
-            CropForegroundd(keys=["image", "label"], source_key="image"),
-            EnsureTyped(keys=["image", "label"]),
-        ]
-    )
+    val_transforms = Compose([LoadImage(image_only=True), AddChannel(), ScaleIntensity(), ToTensor()])
 
     # monai algorithm object
     ma = MonaiAlgo()
 
     ma.act = Activations(softmax=True)
-    ma.to_onehot = AsDiscrete(to_onehot=True, n_classes=mo.num_class)    # ma.test_loader = test_loader_workers=2)
+    ma.to_onehot = AsDiscrete(to_onehot=True, n_classes=mo.num_class)
 
-    train_ds = Dataset(train, train_transforms)
-    train_loader = DataLoader(train_ds, batch_size=1, shuffle=True, num_workers=2)
+    train_ds = MedNISTDataset(train_x, train_y, train_transforms)
+    train_loader = torch.utils.data.DataLoader(train_ds, batch_size=128, shuffle=True, num_workers=2)
 
-    val_ds = Dataset(val, val_transforms)
-    val_loader = DataLoader(val_ds, batch_size=1, num_workers=2)
+    val_ds = MedNISTDataset(val_x, val_y, val_transforms)
+    val_loader = torch.utils.data.DataLoader(val_ds, batch_size=128, num_workers=2)
 
-    # test_ds = Dataset(test, val_transforms)
-    # test_loader = DataLoader(test_ds, batch_size=1, num_workers=2)
-
+    test_ds = MedNISTDataset(test_x, test_y, val_transforms)
+    test_loader = torch.utils.data.DataLoader(test_ds, batch_size=128, num_workers=2)
 
     # model initiliatization
-    ma.model = UNet(
-                    dimensions=3,
-                    in_channels=1,
-                    out_channels=2,
-                    channels=(16, 32, 64, 128, 256),
-                    strides=(2, 2, 2, 2),
-                    num_res_units=2,
-                    norm=Norm.BATCH)
+    ma.model = DenseNet121(spatial_dims=2, in_channels=1, out_channels=mo.num_class)#.to(device)
 
-    ma.loss_function = DiceLoss(to_onehot_y=True, softmax=True)
-    ma.optimizer = torch.optim.Adam(ma.model.parameters(), 1e-4)
-    ma.dice_metric = DiceMetric(include_background=False, reduction="mean")
+    # model loss function
+    ma.loss_function = torch.nn.CrossEntropyLoss()
+
+    # model optimizer
+    ma.optimizer = torch.optim.Adam(ma.model.parameters(), 1e-5)
 
     # number of epochs
-    ma.epochs = 2
+    ma.epochs = 1
 
     # training/validation/testing datasets
     ma.train_ds = train_ds
     ma.val_ds = val_ds
-    # ma.test_ds = test_ds
+    ma.test_ds = test_ds
 
     # training/validation/testing data loaders
     ma.train_loader = train_loader
     ma.val_loader = val_loader
-    # ma.test_loader = test_loader
+    ma.test_loader = test_loader
 
     client = Client("localhost:50051")
 

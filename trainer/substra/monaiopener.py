@@ -1,4 +1,3 @@
-from pathlib import Path
 import os
 
 import sys
@@ -11,7 +10,6 @@ import PIL
 import numpy as np
 import matplotlib.pyplot as plt
 import torch
-import glob
 
 
 class MonaiOpener(Opener):
@@ -56,36 +54,45 @@ class MonaiOpener(Opener):
         plt.tight_layout()
         # plt.show()
 
-    def get_x_y(self):
-        train_images = sorted(
-            glob.glob(os.path.join(self.data_dir, "imagesTr", "*.nii.gz")))
-        train_labels = sorted(
-            glob.glob(os.path.join(self.data_dir, "labelsTr", "*.nii.gz")))
-
-        # test_x = sorted(
-        #     glob.glob(os.path.join(self.data_dir, "imagesTs", "*.nii.gz")))
-        # test_y = sorted(
-        #     glob.glob(os.path.join(self.data_dir, "labelsTs", "*.nii.gz")))
-
-        train_x = train_images[:-9]
-        train_y = train_labels[:-9]
-
-        val_x = train_images[-9:]
-        val_y = train_labels[-9:]
-
-        train_files = [
-            {"image": image_name, "label": label_name}
-            for image_name, label_name in zip(train_x, train_y)
+    def get_x_y(self, folders, frac_val, frac_test):
+        train_x = list()
+        train_y = list()
+        val_x = list()
+        val_y = list()
+        test_x = list()
+        test_y = list()
+        
+        self.class_names = folders
+        self.num_class = len(self.class_names)
+        #print("Root Directory (dataset): " + self.data_dir)
+        
+        image_files = [
+            [
+                os.path.join(self.data_dir, self.class_names[i], x)
+                for x in os.listdir(os.path.join(self.data_dir, self.class_names[i]))
+            ]
+            for i in range(self.num_class)
         ]
-        # test_files = [
-        #     {"image": image_name, "label": label_name}
-        #     for image_name, label_name in zip(test_x, test_y)
-        # ]
-        val_files = [
-            {"image": image_name, "label": label_name}
-            for image_name, label_name in zip(val_x, val_y)
-        ]
-        return train_files, val_files#, test_files
+        num_each = [len(image_files[i]) for i in range(self.num_class)]
+        image_files_list = []
+        image_class = []
+        for i in range(self.num_class):
+            image_files_list.extend(image_files[i])
+            image_class.extend([i] * num_each[i])
+        num_total = len(image_class)
+
+        for i in range(num_total):
+            rann = np.random.random()
+            if rann < frac_val:
+                val_x.append(image_files_list[i])
+                val_y.append(image_class[i])
+            elif rann < (frac_val+frac_test):
+                test_x.append(image_files_list[i])
+                test_y.append(image_class[i])
+            else:
+                train_x.append(image_files_list[i])
+                train_y.append(image_class[i])
+        return (train_x, train_y, val_x, val_y, test_x, test_y)
 
     def save_predictions(self, y_pred, path):
         with open(path, 'w') as fp:
@@ -124,4 +131,4 @@ class MedNISTDataset(torch.utils.data.Dataset):
         return len(self.image_files)
 
     def __getitem__(self, index):
-        return self.transforms(self.image_files[index], self.labels[index])
+        return self.transforms(self.image_files[index]), self.labels[index]
