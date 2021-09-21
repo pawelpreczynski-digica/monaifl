@@ -5,7 +5,6 @@ import os
 import torch
 from sklearn.metrics import classification_report
 from trainer.substra.algo import Algo
-from trainer.substra.substraclient import Client
 from common.utils import Mapping
 from monai.inferers import sliding_window_inference
 from monai.data import decollate_batch
@@ -122,8 +121,7 @@ class MonaiAlgo(Algo):
         return checkpoint
 
 
-    def load_model(self):
-        client = Client("localhost:50051")
+    def load_model(self, client):
         path = client.modelFile
         self.model.load_state_dict(torch.load(path))
         print("model loaded and creating report...")
@@ -132,10 +130,10 @@ class MonaiAlgo(Algo):
         pass
         # json.dump(model, path)
 
-    def predict(self, model, class_names):
+    def predict(self, client, model, class_names):
         set_determinism(seed=0)
         device = torch.device(DEVICE) 
-        self.load_model()
+        self.load_model(client)
         self.model.to(device)
         self.model.eval()
 
