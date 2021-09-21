@@ -21,7 +21,8 @@ modelpath = os.path.join(cwd, "save","models","client")
 modelName = 'monai-test.pth.tar'
 
 class Client():
-    def __init__(self, address):
+    def __init__(self, id, address):
+        self.id = id
         self.address = address
         self.client = None
         self.fl_request = None
@@ -34,7 +35,7 @@ class Client():
      
     def bootstrap(self, model, optim):
         print("Connecting and receveing initial model checkpoint...")
-        self.data = {"id":"client1", "model": model}
+        self.data = {"id": self.id, "model": model}
         buffer = BytesIO()
         t.save(self.data, buffer)
         size = buffer.getbuffer().nbytes

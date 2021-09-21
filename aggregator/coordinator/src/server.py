@@ -22,7 +22,7 @@ modelFile = os.path.join(modelpath, modelName)
 
 w_loc = []
 request_data = Mapping()
-whitelist = ["client1"]
+whitelist = ["client1", "client2"]
 
 class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
     

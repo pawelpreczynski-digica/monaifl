@@ -14,7 +14,7 @@ from common.utils import Mapping
 
 from pathlib import Path
 
-if __name__ == '__main__':
+def instantiateMonaiAlgo(frac_val = 0.1, frac_test = 0.1):
     cwd = Path.cwd()
     print(cwd)
 
@@ -22,7 +22,6 @@ if __name__ == '__main__':
     data_path = os.path.join(cwd, "trainer", "substra")
     data_dir = os.path.join(data_path, datasetName)
     folders = os.listdir(data_dir)
-    #modelpath = os.path.join(home, "monaifl", "save","models","client")
     #model_dir = "./model/"
 
     mo = MonaiOpener(data_dir)
@@ -30,7 +29,7 @@ if __name__ == '__main__':
     print("Dataset Summary")
     print("----------------------------")
     print(mo.data_summary(folders))
-    train_x, train_y, val_x, val_y, test_x, test_y = mo.get_x_y(folders, 0.1, 0.1)
+    train_x, train_y, val_x, val_y, test_x, test_y = mo.get_x_y(folders, frac_val, frac_test)
     print(f"Training count: {len(train_x)}, Validation count: {len(val_x)}, Test count: {len(test_x)}")
 
     # getting class names
@@ -86,8 +85,12 @@ if __name__ == '__main__':
     ma.train_loader = train_loader
     ma.val_loader = val_loader
     ma.test_loader = test_loader
+    
+    return ma, class_names
 
-    client = Client("localhost:50051")
+if __name__ == '__main__':
+    ma, class_names = instantiateMonaiAlgo()
+    client = Client("client1", "localhost:50051")
 
     client.bootstrap(ma.model, ma.optimizer)
 
