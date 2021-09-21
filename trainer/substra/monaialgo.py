@@ -5,7 +5,6 @@ import os
 import torch
 from sklearn.metrics import classification_report
 from trainer.substra.algo import Algo
-from trainer.substra.substraclient import Client
 from common.utils import Mapping
 from monai.metrics import compute_roc_auc
 from monai.utils import set_determinism
