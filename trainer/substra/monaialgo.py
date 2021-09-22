@@ -9,7 +9,12 @@ from common.utils import Mapping
 from monai.metrics import compute_roc_auc
 from monai.utils import set_determinism
 
-DEVICE = "cpu"
+
+
+if torch.cuda.is_available():
+    DEVICE = "cuda:0"
+else:
+    DEVICE = "cpu"
 
 
 class MonaiAlgo(Algo):
