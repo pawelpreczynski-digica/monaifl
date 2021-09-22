@@ -115,7 +115,7 @@ class MonaiAlgo(Algo):
         pass
         # json.dump(model, path)
 
-    def predict(self, client, model, class_names):
+    def predict(self, client, class_names):
         set_determinism(seed=0)
         device = torch.device(DEVICE) 
         self.load_model(client)
@@ -130,7 +130,7 @@ class MonaiAlgo(Algo):
                     test_data[0].to(device),
                     test_data[1].to(device),
                 )
-                pred = model(test_images).argmax(dim=1)
+                pred = self.model(test_images).argmax(dim=1)
                 for i in range(len(pred)):
                     y_true.append(test_labels[i].item())
                     y_pred.append(pred[i].item())
