@@ -102,7 +102,7 @@ if __name__ == '__main__':
     #aggregation request
     client.aggregate(ma.model, ma.optimizer, checkpoint)
     report = Mapping()
-    report = ma.predict(client, ma.model, class_names)
 
     #performs testing on the test dataset and then reports back the summary of training
+    report = ma.predict(client, class_names)
     client.report(report)
