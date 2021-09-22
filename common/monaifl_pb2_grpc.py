@@ -34,7 +34,6 @@ class MonaiFLServiceStub(object):
                 response_deserializer=monaifl__pb2.ParamsResponse.FromString,
                 )
 
-
 class MonaiFLServiceServicer(object):
     """FL service 
     """

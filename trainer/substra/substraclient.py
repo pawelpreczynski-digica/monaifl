@@ -1,6 +1,6 @@
 from pathlib import Path
-home = str(Path.home())
-#print(home)
+cwd = str(Path.cwd())
+print(cwd)
 
 import os
 import sys
@@ -17,12 +17,12 @@ import os
 import copy
 #from reporter import getLocalParameters, setLocalParameters
 
-modelpath = os.path.join(home, "monaifl", "save","models","client")
+modelpath = os.path.join(cwd, "save","models","client")
 modelName = 'monai-test.pth.tar'
-#modelFile = 
 
 class Client():
-    def __init__(self, address):
+    def __init__(self, id, address):
+        self.id = id
         self.address = address
         self.client = None
         self.fl_request = None
@@ -34,8 +34,8 @@ class Client():
 
      
     def bootstrap(self, model, optim):
-        print("Connecting and recveing initial model checkpoint...")
-        self.data = {"id":"client1", "model": model}
+        print("Connecting and receveing initial model checkpoint...")
+        self.data = {"id": self.id, "model": model}
         buffer = BytesIO()
         t.save(self.data, buffer)
         size = buffer.getbuffer().nbytes
@@ -58,7 +58,7 @@ class Client():
     def aggregate(self, model, optim, data):
         print("sending model checkpoint for aggregation...")
         self.data = data
-        #print(self.data.keys())
+        # print(self.data.keys())
         buffer = BytesIO()
         t.save(self.data, buffer)
         size = buffer.getbuffer().nbytes

@@ -3,13 +3,14 @@ sys.path.append('.')
 
 import os
 import torch
-import numpy
 from sklearn.metrics import classification_report
 from trainer.substra.algo import Algo
-from trainer.substra.substraclient import Client
 from common.utils import Mapping
 from monai.metrics import compute_roc_auc
 from monai.utils import set_determinism
+
+DEVICE = "cpu"
+
 
 class MonaiAlgo(Algo):
     def __init__(self):
@@ -23,17 +24,17 @@ class MonaiAlgo(Algo):
         self.train_ds = None
         self.val_ds = None
         self.test_ds = None
-        self.act = None 
+        self.act = None
         self.to_onehot = None
         self.model_dir = None
-        
+
     def train(self, X, y, models, rank):
         epoch_num = 4
 
     def train(self):
-        #"""## Set deterministic training for reproducibility"""
+        # """## Set deterministic training for reproducibility"""
         set_determinism(seed=0)
-        device = torch.device("cuda:0")    
+        device = torch.device(DEVICE)    
         val_interval = 1
         best_metric = -1
         best_metric_epoch = -1
@@ -99,27 +100,23 @@ class MonaiAlgo(Algo):
         print(f"train completed, best_metric: {best_metric:.4f} at epoch: {best_metric_epoch}")
         return checkpoint
 
-    
 
-    def load_model(self):
-        client = Client("localhost:50051")
+    def load_model(self, client):
         path = client.modelFile
         self.model.load_state_dict(torch.load(path))
         print("model loaded and creating report...")
 
-        #return NotImplemented # json.load(path)
-
     def save_model(self, model, path):
         pass
-        #json.dump(model, path)
+        # json.dump(model, path)
 
-    def predict(self, model, class_names):
+    def predict(self, client, model, class_names):
         set_determinism(seed=0)
-        device = torch.device("cuda:0") 
-        self.load_model()
+        device = torch.device(DEVICE) 
+        self.load_model(client)
         self.model.to(device)
         self.model.eval()
-                
+
         y_true = []
         y_pred = []
         with torch.no_grad():
