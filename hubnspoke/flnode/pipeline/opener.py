@@ -5,7 +5,7 @@ import types
 
 import common.utils as utils
 import common.exceptions as exceptions
-from workspace import OpenerWorkspace
+from flnode.pipeline.workspace import OpenerWorkspace
 
 import sys
 sys.path.append('.')

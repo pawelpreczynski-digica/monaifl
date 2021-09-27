@@ -5,7 +5,7 @@ sys.path.append('.')
 
 import os
 import pandas as pd
-from trainer.flnode.opener import Opener
+from flnode.pipeline.opener import Opener
 import PIL
 import numpy as np
 import matplotlib.pyplot as plt

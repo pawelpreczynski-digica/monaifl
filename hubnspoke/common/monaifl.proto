@@ -19,5 +19,5 @@ service MonaiFLService{
   rpc MessageTransfer(ParamsRequest) returns (ParamsResponse);
   rpc TrainingStatus(ParamsRequest) returns (ParamsResponse);
   rpc TrainedModel(ParamsRequest) returns (ParamsResponse);
-
+  rpc StopMessage(ParamsRequest) returns (ParamsResponse);
 }

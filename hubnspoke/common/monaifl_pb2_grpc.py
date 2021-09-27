@@ -45,6 +45,11 @@ class MonaiFLServiceStub(object):
                 request_serializer=monaifl__pb2.ParamsRequest.SerializeToString,
                 response_deserializer=monaifl__pb2.ParamsResponse.FromString,
                 )
+        self.StopMessage = channel.unary_unary(
+                '/protobufs.MonaiFLService/StopMessage',
+                request_serializer=monaifl__pb2.ParamsRequest.SerializeToString,
+                response_deserializer=monaifl__pb2.ParamsResponse.FromString,
+                )
 
 
 class MonaiFLServiceServicer(object):
@@ -87,6 +92,12 @@ class MonaiFLServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def StopMessage(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_MonaiFLServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -117,6 +128,11 @@ def add_MonaiFLServiceServicer_to_server(servicer, server):
             ),
             'TrainedModel': grpc.unary_unary_rpc_method_handler(
                     servicer.TrainedModel,
+                    request_deserializer=monaifl__pb2.ParamsRequest.FromString,
+                    response_serializer=monaifl__pb2.ParamsResponse.SerializeToString,
+            ),
+            'StopMessage': grpc.unary_unary_rpc_method_handler(
+                    servicer.StopMessage,
                     request_deserializer=monaifl__pb2.ParamsRequest.FromString,
                     response_serializer=monaifl__pb2.ParamsResponse.SerializeToString,
             ),
@@ -228,6 +244,23 @@ class MonaiFLService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/protobufs.MonaiFLService/TrainedModel',
+            monaifl__pb2.ParamsRequest.SerializeToString,
+            monaifl__pb2.ParamsResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def StopMessage(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/protobufs.MonaiFLService/StopMessage',
             monaifl__pb2.ParamsRequest.SerializeToString,
             monaifl__pb2.ParamsResponse.FromString,
             options, channel_credentials,

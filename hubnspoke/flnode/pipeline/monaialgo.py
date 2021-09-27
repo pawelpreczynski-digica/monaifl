@@ -4,7 +4,7 @@ sys.path.append('.')
 import os
 import torch
 from sklearn.metrics import classification_report
-from trainer.flnode.algo import Algo
+from flnode.pipeline.algo import Algo
 from common.utils import Mapping
 from monai.metrics import compute_roc_auc
 from monai.utils import set_determinism
@@ -13,6 +13,8 @@ if torch.cuda.is_available():
     DEVICE = "cuda:0"
 else:
     DEVICE = "cpu"
+
+
 
 class MonaiAlgo(Algo):
     def __init__(self):
@@ -103,8 +105,8 @@ class MonaiAlgo(Algo):
         return checkpoint
 
 
-    def load_model(self, client):
-        path = client.modelFile
+    def load_model(self, modelFile):
+        path = modelFile
         self.model.load_state_dict(torch.load(path))
         print("model loaded and creating report...")
 
@@ -112,10 +114,10 @@ class MonaiAlgo(Algo):
         pass
         # json.dump(model, path)
 
-    def predict(self, client, class_names):
+    def predict(self, class_names, headModelFile):
         set_determinism(seed=0)
         device = torch.device(DEVICE) 
-        self.load_model(client)
+        self.load_model(headModelFile)
         self.model.to(device)
         self.model.eval()
 

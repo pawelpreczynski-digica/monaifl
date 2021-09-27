@@ -105,20 +105,21 @@ if __name__ == '__main__':
     client.train(epochs='1')
 
     trained = client.status()
-    print("Training Completed?: " + trained)
+    print("training completed?: " + trained)
     while (trained != "yes"):
         time.sleep(5)
         trained = client.status()
-        print("Training Completed?: " + trained)
+        print("training completed?: " + trained)
         
     checkpoint = client.gather()  
     
     #client.aggregate()
     
-    #client.test()     
+    client.test()     
     
     #client.staus()
 
+    client.stop()
     # # training and checkpoints
     # checkpoint = Mapping()
     # checkpoint = ma.train()

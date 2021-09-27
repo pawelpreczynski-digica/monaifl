@@ -14,6 +14,9 @@ from common.monaifl_pb2 import ParamsResponse
 from common.utils import Mapping
 import torch as t
 import copy
+import subprocess
+from flnode.start_pipeline import instantiateMonaiAlgo
+
 
 modelName = "monai-test.pth.tar"
 
@@ -26,54 +29,47 @@ trunkModelFile = os.path.join(trunkmodelpath, modelName)
 w_loc = []
 request_data = Mapping()
 whitelist = ["client1", "client2"]
+ma, class_names = instantiateMonaiAlgo(0.2, 0.5)
 
 class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
     
     def __init__(self):
         self.model = None
         
-    # def ModelTransfer(self, request, context):
-    #     request_bytes = BytesIO(request.para_request)
-    #     request_data = t.load(request_bytes, map_location='cpu')
-    #     print('Received Model Request: ', request_data.keys())   
-    #     buffer = BytesIO()
-    #     if request_data['id'] in whitelist:
-    #         print(request_data['id'])
-    #         self.model = request_data['model']
-    #         if os.path.isfile(modelFile):
-    #             print("sending model...") 
-    #             print(modelFile)
-    #             checkpoint = t.load(modelFile)
-    #             t.save(checkpoint['weights'], buffer)
-    #         else:
-    #             print("initial model does not exist, initializing and sending a new one...")
-    #             t.save(self.model.state_dict(), buffer)
-    #     else:
-    #         print("Please contact admin for permissions...")
-    #     return ParamsResponse(para_response=buffer.getvalue())
-
+    
     def ModelTransfer(self, request, context):
         request_bytes = BytesIO(request.para_request)
         request_data = t.load(request_bytes, map_location='cpu')
-        print('Received Global Model')   
         buffer = BytesIO()
         t.save(request_data, headModelFile)
         if os.path.isfile(headModelFile):
             request_data.update(reply="yes")
-            print("Model Recieved at: ", headModelFile)
+            print("global model recieved at: ", headModelFile)
             print("FL node is ready for training and waiting for training configurations")
         else:
             request_data.update(reply="no")
-            print("Error: FL node is not ready for training")
+            print("error: FL node is not ready for training")
         t.save(request_data['reply'], buffer)
         return ParamsResponse(para_response=buffer.getvalue())
     
     def MessageTransfer(self, request, context):
         request_bytes = BytesIO(request.para_request)
         request_data = t.load(request_bytes, map_location='cpu')
-        print('Received Training Configurations')
-        print(request_data['epochs'])
-        print("Starting training...")
+        print('received training configurations')
+        print("local epochs:", request_data['epochs'])
+        print("starting training...")
+        
+        
+        
+        # training and checkpoints
+        checkpoint = Mapping()
+        checkpoint = ma.train()
+        ma.save_model(checkpoint, trunkModelFile)
+        #train_instruction = 'python start_pipeline.py'
+        #subprocess.Popen(['python', 'flnode/start_pipeline.py', '0'], close_fds=True)
+        #subprocess.Popen(train_instruction, close_fds=True)
+#        b = os.popen(train_instruction)
+#        print(b)
         buffer = BytesIO()
         request_data.update(reply="yes")
         t.save(request_data['reply'], buffer)
@@ -100,6 +96,63 @@ class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
                 t.save(checkpoint, buffer)
         return ParamsResponse(para_response=buffer.getvalue())
     
+    def ReportTransfer(self, request, context):
+        request_bytes = BytesIO(request.para_request)
+        request_data = t.load(request_bytes, map_location='cpu')
+        print('received test request...')   
+        response_data = Mapping()
+        response_data = ma.predict(class_names, headModelFile)
+        print("sending client test report to the server...")       
+        buffer = BytesIO()
+        t.save(response_data['report'], buffer)
+        return ParamsResponse(para_response=buffer.getvalue())
+    
+    def StopMessage(self, request, context):
+        request_bytes = BytesIO(request.para_request)
+        request_data = t.load(request_bytes, map_location='cpu')
+        print('received test request...')   
+        
+
+def serve():
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10),options=[
+               ('grpc.max_send_message_length', 1000*1024*1024),
+               ('grpc.max_receive_message_length', 1000*1024*1024)])
+    monaifl_pb2_grpc.add_MonaiFLServiceServicer_to_server(
+        MonaiFLService(), server)
+    server.add_insecure_port("[::]:50051")
+    server.start()
+    print("Trainer is up and waiting for training configurations...")
+    server.wait_for_termination()
+
+if __name__ == "__main__":
+    serve()
+
+
+
+
+
+
+
+####extra code
+# def ModelTransfer(self, request, context):
+    #     request_bytes = BytesIO(request.para_request)
+    #     request_data = t.load(request_bytes, map_location='cpu')
+    #     print('Received Model Request: ', request_data.keys())   
+    #     buffer = BytesIO()
+    #     if request_data['id'] in whitelist:
+    #         print(request_data['id'])
+    #         self.model = request_data['model']
+    #         if os.path.isfile(modelFile):
+    #             print("sending model...") 
+    #             print(modelFile)
+    #             checkpoint = t.load(modelFile)
+    #             t.save(checkpoint['weights'], buffer)
+    #         else:
+    #             print("initial model does not exist, initializing and sending a new one...")
+    #             t.save(self.model.state_dict(), buffer)
+    #     else:
+    #         print("Please contact admin for permissions...")
+    #     return ParamsResponse(para_response=buffer.getvalue())
     # def ParamTransfer(self, request, context):
     #     epochs = 0
     #     w_glob = list() 
@@ -174,31 +227,35 @@ class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
     #     print("Returning Checkpoint...") 
     #     return ParamsResponse(para_response=buffer.getvalue())
  
-    def ReportTransfer(self, request, context):
-        request_bytes = BytesIO(request.para_request)
-        request_data = t.load(request_bytes, map_location='cpu')
-        print('Received Model Report: ', request_data.keys())   
-        buffer = BytesIO()
-        if request_data['report']:
-            print(request_data['report'])
-            request_data.update(reply="Thanks for reporting test statistics")
-        else:
-            print("No test statistics were reported...")
-            request_data.update(reply="Server was expecting test statistics but nothing received yet")
-        t.save(request_data['reply'], buffer)
-        return ParamsResponse(para_response=buffer.getvalue())
 
-def serve():
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10),options=[
-               ('grpc.max_send_message_length', 1000*1024*1024),
-               ('grpc.max_receive_message_length', 1000*1024*1024)])
-    monaifl_pb2_grpc.add_MonaiFLServiceServicer_to_server(
-        MonaiFLService(), server)
-    server.add_insecure_port("[::]:50051")
-    server.start()
-    print("Trainer is up and waiting for training configurations...")
-    server.wait_for_termination()
 
-if __name__ == "__main__":
-    serve()
 
+    # def report(self, data):
+    #     print("sending client test report to the server...")
+    #     self.data = data
+    #     print(self.data['report'])
+    #     buffer = BytesIO()
+    #     t.save(self.data, buffer)
+    #     size = buffer.getbuffer().nbytes
+    #     opts = [('grpc.max_receive_message_length', size*2), ('grpc.max_send_message_length', size*2), ('grpc.max_message_length', size*2)]
+    #     self.channel = grpc.insecure_channel(self.address, options = opts)
+    #     client = MonaiFLServiceStub(self.channel)
+    #     self.fl_request = ParamsRequest(para_request=buffer.getvalue())
+    #     fl_response = client.ReportTransfer(self.fl_request)
+    #     response_bytes = BytesIO(fl_response.para_response)
+    #     response_data = t.load(response_bytes, map_location='cpu')
+    #     print('Received Server Report: ', response_data)   
+
+
+        # request_bytes = BytesIO(request.para_request)
+        # request_data = t.load(request_bytes, map_location='cpu')
+        # print('Received Model Report: ', request_data.keys())   
+        # buffer = BytesIO()
+        # if request_data['report']:
+        #     print(request_data['report'])
+        #     request_data.update(reply="Thanks for reporting test statistics")
+        # else:
+        #     print("No test statistics were reported...")
+        #     request_data.update(reply="Server was expecting test statistics but nothing received yet")
+        # t.save(request_data['reply'], buffer)
+        # return ParamsResponse(para_response=buffer.getvalue())

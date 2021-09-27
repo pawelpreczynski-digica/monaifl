@@ -16,7 +16,6 @@ import torch as t
 import io
 import os
 import copy
-#from reporter import getLocalParameters, setLocalParameters
 from hub.coordinator import FedAvg
 
 #modelpath = os.path.join(cwd, "save","models","client")
@@ -119,9 +118,36 @@ class Client():
         buffer = BytesIO()
         t.save(w_glob, modelFile)
         #print(w_glob)
-                 
+    
+    def test(self):
+        self.data={"id":"server"}
+        buffer = BytesIO()
+        t.save(self.data, buffer)
+        size = buffer.getbuffer().nbytes
+        opts = [('grpc.max_receive_message_length', 1000*1024*1024), ('grpc.max_send_message_length', size*2), ('grpc.max_message_length', 1000*1024*1024)]
+        self.channel = grpc.insecure_channel(self.address, options = opts)
+        client = MonaiFLServiceStub(self.channel)
+        self.fl_request = ParamsRequest(para_request=buffer.getvalue())
+        fl_response = client.ReportTransfer(self.fl_request)
+        response_bytes = BytesIO(fl_response.para_response)    
+        response_data = t.load(response_bytes, map_location='cpu')
+        print(response_data)
+    
+    def stop(self):
+        self.data={"stop":"yes"}
+        buffer = BytesIO()
+        t.save(self.data, buffer)
+        size = buffer.getbuffer().nbytes
+        opts = [('grpc.max_receive_message_length', 1000*1024*1024), ('grpc.max_send_message_length', size*2), ('grpc.max_message_length', 1000*1024*1024)]
+        self.channel = grpc.insecure_channel(self.address, options = opts)
+        client = MonaiFLServiceStub(self.channel)
+        self.fl_request = ParamsRequest(para_request=buffer.getvalue())
+        fl_response = client.StopMessage(self.fl_request)
+        response_bytes = BytesIO(fl_response.para_response)    
+        response_data = t.load(response_bytes, map_location='cpu')
+        print(response_data)
   
-  
+  #extra code
     #     self.data = {"id": self.id, "model": model}
     #     buffer = BytesIO()
     #     t.save(self.data, buffer)
