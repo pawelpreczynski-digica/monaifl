@@ -110,8 +110,14 @@ class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
     def StopMessage(self, request, context):
         request_bytes = BytesIO(request.para_request)
         request_data = t.load(request_bytes, map_location='cpu')
-        print('received test request...')   
-        
+        print('received stop request...')   
+        response_data = Mapping()
+        response_data = ma.predict(class_names, headModelFile)
+        print("sending client test report to the server...")       
+        buffer = BytesIO()
+        response_data.update(reply="yes")
+        t.save(response_data, buffer)
+        return ParamsResponse(para_response=buffer.getvalue())
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10),options=[
