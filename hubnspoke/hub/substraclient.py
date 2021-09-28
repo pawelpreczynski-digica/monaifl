@@ -145,7 +145,7 @@ class Client():
         fl_response = client.StopMessage(self.fl_request)
         response_bytes = BytesIO(fl_response.para_response)    
         response_data = t.load(response_bytes, map_location='cpu')
-        print(response_data)
+        print(response_data['reply'])
   
   #extra code
     #     self.data = {"id": self.id, "model": model}
