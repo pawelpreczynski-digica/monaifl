@@ -111,12 +111,11 @@ class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
         request_bytes = BytesIO(request.para_request)
         request_data = t.load(request_bytes, map_location='cpu')
         print('received stop request...')   
-        response_data = Mapping()
-        response_data = ma.predict(class_names, headModelFile)
-        print("sending client test report to the server...")       
         buffer = BytesIO()
-        response_data.update(reply="yes")
+        response_data = Mapping()
+        response_data.update(reply="Thanks, Node is stopping now...")
         t.save(response_data, buffer)
+        print('server stopping...(Not implemented yet)')   
         return ParamsResponse(para_response=buffer.getvalue())
 
 def serve():
