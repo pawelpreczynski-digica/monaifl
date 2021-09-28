@@ -108,8 +108,9 @@ class MonaiAlgo(Algo):
         self.model.load_state_dict(torch.load(path))
         print("model loaded and creating report...")
 
-    def save_model(self, model, path):
-        pass
+    def save_model(self, checkpoint, trunkModelFile):
+        torch.save(checkpoint, trunkModelFile)
+        print("model saved at: ", trunkModelFile)
         # json.dump(model, path)
 
     def predict(self, client, class_names):
