@@ -108,7 +108,6 @@ class MonaiAlgo(Algo):
     def load_model(self, modelFile):
         path = modelFile
         self.model.load_state_dict(torch.load(path))
-        print("model loaded and creating report...")
 
     def save_model(self, model, path):
         pass

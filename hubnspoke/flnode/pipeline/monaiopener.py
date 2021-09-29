@@ -21,7 +21,6 @@ class MonaiOpener(Opener):
     def data_summary(self, folders):
         self.class_names = folders
         self.num_class = len(self.class_names)
-        # print("Root Directory (dataset): " + self.data_dir)
 
         image_files = [
             [
@@ -44,14 +43,14 @@ class MonaiOpener(Opener):
         print(f"Label names: {self.class_names}")
         print(f"Label counts: {num_each}")
 
-        plt.subplots(3, 3, figsize=(8, 8))
-        for i, k in enumerate(np.random.randint(num_total, size=9)):
-            im = PIL.Image.open(image_files_list[k])
-            arr = np.array(im)
-            plt.subplot(3, 3, i + 1)
-            plt.xlabel(self.class_names[image_class[k]])
-            plt.imshow(arr, cmap="gray", vmin=0, vmax=255)
-        plt.tight_layout()
+        # plt.subplots(3, 3, figsize=(8, 8))
+        # for i, k in enumerate(np.random.randint(num_total, size=9)):
+        #     im = PIL.Image.open(image_files_list[k])
+        #     arr = np.array(im)
+        #     plt.subplot(3, 3, i + 1)
+        #     plt.xlabel(self.class_names[image_class[k]])
+        #     plt.imshow(arr, cmap="gray", vmin=0, vmax=255)
+        # plt.tight_layout()
         # plt.show()
 
     def get_x_y(self, folders, frac_val, frac_test):
