@@ -2,13 +2,11 @@ import os
 import sys
 sys.path.append('.')
 import torch as t
-from io import BytesIO
 from monai.networks.nets import DenseNet121
 from monai.transforms import (Activations, AddChannel, AsDiscrete, Compose, LoadImage, RandFlip, RandRotate, RandZoom,
     ScaleIntensity, ToTensor,)
 from pipeline.monaiopener import MonaiOpener, MedNISTDataset
 from pipeline.monaialgo import MonaiAlgo
-#from pipeline.substraclient import Client
 from common.utils import Mapping
 
 from pathlib import Path
@@ -17,17 +15,15 @@ def instantiateMonaiAlgo(frac_val = 0.1, frac_test = 0.1):
     cwd = Path.cwd()
     print(cwd)
     datasetName = 'MedNIST'
-    #hubnspoke/flnode/MedNIST
     data_path = os.path.join(cwd, "flnode")
     data_dir = os.path.join(data_path, datasetName)
     folders = os.listdir(data_dir)
-    #model_dir = "./model/"
 
     mo = MonaiOpener(data_dir)
     print("----------------------------")
     print("Dataset Summary")
     print("----------------------------")
-    print(mo.data_summary(folders))
+    mo.data_summary(folders)
     train_x, train_y, val_x, val_y, test_x, test_y = mo.get_x_y(folders, frac_val, frac_test)
     print(f"Training count: {len(train_x)}, Validation count: {len(val_x)}, Test count: {len(test_x)}")
 
@@ -89,19 +85,7 @@ def instantiateMonaiAlgo(frac_val = 0.1, frac_test = 0.1):
 
 if __name__ == '__main__':
     ma, class_names = instantiateMonaiAlgo()
-    #client = Client("client1", "localhost:50051")
-
-    #client.bootstrap(ma.model, ma.optimizer)
-
-    # training and checkpoints
+    
     checkpoint = Mapping()
     checkpoint = ma.train()
-    # print(checkpoint)
 
-    #aggregation request
-    #client.aggregate(ma.model, ma.optimizer, checkpoint)
-    #report = Mapping()
-    #report = ma.predict(client, class_names)
-
-    #performs testing on the test dataset and then reports back the summary of training
-    #client.report(report)
