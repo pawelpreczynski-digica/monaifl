@@ -40,14 +40,18 @@ class Client():
         self.loc_weights = None
     
 
-    def bootstrap(self):
+    def bootstrap(self, model, optim):
         logger.info("Bootstrapping with fl node at " + self.address)
         buffer = BytesIO()
         if self.address in whitelist:
             logger.info(self.address + " is whitelisted")
             if os.path.isfile(modelFile):
+                checkpoint = Mapping()
                 logger.info(f"Buffering the provided initial model {modelFile}...") 
-                checkpoint = t.load(modelFile)
+                self.model=model
+                self.optimizer = optim
+                self.loc_weights = t.load(modelFile['weights'])
+                checkpoint.update(model=self.model, optim=self.optimizer, weights=self.loc_weights)
                 t.save(checkpoint, buffer)
             else:
                 logger.info("The initial model does not exist, initializing and buffering a new one...")

@@ -38,12 +38,20 @@ class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
     
     def __init__(self):
         self.model = None
+        self.optim = None
+        self.weights = None
         
     
     def ModelTransfer(self, request, context):
         request_bytes = BytesIO(request.para_request)
         request_data = t.load(request_bytes, map_location='cpu')
-        t.save(request_data, headModelFile)
+        self.model = request_data['model']
+        self.optim = request_data['optim']
+        self.model = request_data['weights']
+        
+        self.model.load_state_dict(self.weights)
+        self.model.eval()
+        t.save(self.model.state_dict(), headModelFile)
         if os.path.isfile(headModelFile):
             request_data.update(reply="Model received")
             logger.info(f"Global model saved at: {headModelFile}")
