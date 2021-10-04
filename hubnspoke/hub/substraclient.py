@@ -14,7 +14,6 @@ from common.utils import Mapping
 import torch as t
 import os
 import copy
-from hub.coordinator import FedAvg
 import logging
 logging.basicConfig(format='%(asctime)s - %(message)s')
 logger = logging.getLogger()
@@ -27,7 +26,7 @@ modelName = "monai-test.pth.tar"
 modelFile = os.path.join(modelpath, modelName)
 w_loc = []
 request_data = Mapping()
-whitelist = ["localhost:50051", "client2"]
+whitelist = ["localhost:50051", "localhost:5005"]
 w_glob = list() 
 
 class Client():
@@ -38,7 +37,7 @@ class Client():
         self.model = None
         self.optimizer = None
         self.modelFile = os.path.join(modelpath, modelName)
-
+        self.loc_weights = None
     
 
     def bootstrap(self):
@@ -85,8 +84,10 @@ class Client():
         logger.info(f"Received the training started ack from {self.address}")
         response_bytes = BytesIO(fl_response.para_response)
         response_data = t.load(response_bytes, map_location='cpu')
+        print(response_data)
         logger.info(f"{self.address} returned status: {response_data}") # Training started 
-
+        return response_data
+    
     def status(self):
         self.data = {"check": 'check'}
         buffer = BytesIO()
@@ -104,6 +105,7 @@ class Client():
         response_bytes = BytesIO(fl_response.para_response)
         response_data = t.load(response_bytes, map_location='cpu')
         logger.info(f"{self.address} returned status: {response_data}") # Training completed OR Training in progress 
+        print(response_data)
         return response_data
   
     def gather(self):
@@ -122,12 +124,9 @@ class Client():
         logger.info(f"Received the trained model from {self.address}")
         response_bytes = BytesIO(fl_response.para_response)    
         response_data = t.load(response_bytes, map_location='cpu')
+        return response_data
         
-        logger.info(f"Saving the model weights received from {self.address}...")
-        w_loc.append(copy.deepcopy(response_data['weights']))
-        w_glob = FedAvg(w_loc)
-        buffer = BytesIO()
-        t.save(w_glob, modelFile)
+        
     
     def test(self):
         self.data={"id":"server"} # useless

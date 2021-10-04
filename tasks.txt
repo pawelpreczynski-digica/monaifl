@@ -1,9 +1,0 @@
- - modify the 'compute plan' functionality to include test (at the client) 
-   and aggregation (at the server) steps after the current train (client) 
-   and aggregate (server) steps
- - include the results from these 'test' and 'aggregation' steps in the output file
- - log the start and finish of each step at the client and server, along with any errors
- - implement a callback once the full 'compute plan' has finished, so we can advise out
-   to researchers
- - containerise the code for deployment in Kubernetes
- - ensure all metrics from client and server steps are included in output file
