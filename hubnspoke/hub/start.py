@@ -44,32 +44,31 @@ def train_plan(client):
 
 def aggregate():
     for client in clients:
-        print(client.address)
+        logger.info(f"Aggregating with Node: {client.address}...") 
         checkpoint = client.gather()
-        print(checkpoint.keys())
         for k in checkpoint.keys():
             if k == "epoch":
                 #epochs = checkpoint['epoch']
-                print("Best Epoch at Client: " + str(checkpoint['epoch']) )
+                logger.info(f"Best Epoch at Client: {checkpoint['epoch']}...") 
             elif k == "weights":
                 w = checkpoint['weights']
-                print("Copying weights...")
+                logger.info("Copying weights...")
                 w_loc.append(copy.deepcopy(w))
-                print("Aggregating weights...")
+                logger.info("Aggregating weights...")
                 w_glob = FedAvg(w_loc)
             elif k == "metric":
-                print("Best Metric at Client: " + str(checkpoint['metric']) )
+                logger.info(f"Best Metric at Client: {checkpoint['metric']}..." )
             else:
-                print('Server does not recognized the sent data')
+                logger.info('Server does not recognized the sent data')
 
     cpt = {#'epoch': 1, # to be determined
             'weights': w_glob#,
             #'metric': 0 # to be aggregated
             }
     t.save(cpt, modelFile)
-    print(cpt)
+    print(cpt.keys())
     time.sleep(10)
-    print("aggregation completed")
+    logger.info("aggregation completed")
 
 def test_plan(client):
     # testing models on nodes
@@ -90,7 +89,7 @@ if __name__ == '__main__':
         result = executor.map(test_plan, clients)    
     
     # all process excuted 
-    print("Done!")
+    logger.info("Done!")
 
 
 
