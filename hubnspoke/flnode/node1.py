@@ -24,10 +24,10 @@ logger.setLevel(logging.NOTSET)
 
 modelName = "monai-test.pth.tar"
 
-headmodelpath = os.path.join(cwd, "save","models","node","head")
+headmodelpath = os.path.join(cwd, "save","models","node1","head")
 headModelFile = os.path.join(headmodelpath, modelName)
 
-trunkmodelpath = os.path.join(cwd, "save","models","node","trunk")
+trunkmodelpath = os.path.join(cwd, "save","models","node1","trunk")
 trunkModelFile = os.path.join(trunkmodelpath, modelName)
 
 w_loc = []
@@ -35,23 +35,12 @@ request_data = Mapping()
 ma, class_names = instantiateMonaiAlgo(0.4, 0.5)
 
 class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
-    
-    def __init__(self):
-        self.model = None
-        self.optim = None
-        self.weights = None
-        
+            
     
     def ModelTransfer(self, request, context):
         request_bytes = BytesIO(request.para_request)
         request_data = t.load(request_bytes, map_location='cpu')
-        self.model = request_data['model']
-        self.optim = request_data['optim']
-        self.model = request_data['weights']
-        
-        self.model.load_state_dict(self.weights)
-        self.model.eval()
-        t.save(self.model.state_dict(), headModelFile)
+        t.save(request_data, headModelFile)
         if os.path.isfile(headModelFile):
             request_data.update(reply="Model received")
             logger.info(f"Global model saved at: {headModelFile}")
@@ -70,19 +59,14 @@ class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
         request_data = t.load(request_bytes, map_location='cpu')
         logger.info('Received training configurations')
         logger.info(f"Local epochs to run: {request_data['epochs']}")
-        print(context)
         # training and checkpoints
         logger.info("Starting training...")
         checkpoint = Mapping()
         checkpoint = ma.train()
         logger.info("Saving trained local model...")
         t.save(checkpoint, trunkModelFile)
-        #train_instruction = 'python start_pipeline.py'
-        #subprocess.Popen(['python', 'flnode/start_pipeline.py', '0'], close_fds=True)
-        #subprocess.Popen(train_instruction, close_fds=True)
-#        b = os.popen(train_instruction)
-#        print(b)
-
+        logger.info(f"Local model saved at: {trunkModelFile}")
+        
         logger.info("Sending training completed message to the the Central Hub...")
         buffer = BytesIO()
         request_data.update(reply="Training started")

@@ -15,20 +15,9 @@ from common.utils import Mapping
 logging.basicConfig(format='%(asctime)s - %(message)s')
 logger = logging.getLogger()
 logger.setLevel(logging.NOTSET)
-from io import BytesIO
 import torch as t
 from hub.coordinator import FedAvg
-from flnode.pipeline.monaialgo import MonaiAlgo
-from monai.networks.nets import densenet121
 
-
-#ma = MonaiAlgo()
-# model initiliatization
-model = densenet121(spatial_dims=2, in_channels=1, out_channels=6)#.to(device)
-# model loss function
-#ma.loss_function = t.nn.CrossEntropyLoss()
-# model optimizer
-optimizer = t.optim.Adam(model.parameters(), 1e-5)
 
 modelpath = os.path.join(cwd, "save","models","hub")
 modelName = "monai-test.pth.tar"
@@ -48,8 +37,8 @@ clients = (
 
 def train_plan(client):
     # spreading model to nodes
-    client.bootstrap(model, optimizer)
-
+    client.bootstrap()
+    time.sleep(3)
     # initializing training on nodes
     client.train(epochs='1')
 
@@ -57,34 +46,30 @@ def aggregate():
     for client in clients:
         print(client.address)
         checkpoint = client.gather()
-        for key in checkpoint.keys():
-            if key == 'epoch':
-                epochs = checkpoint['epoch']
+        print(checkpoint.keys())
+        for k in checkpoint.keys():
+            if k == "epoch":
+                #epochs = checkpoint['epoch']
                 print("Best Epoch at Client: " + str(checkpoint['epoch']) )
-            elif key == 'weights':
+            elif k == "weights":
                 w = checkpoint['weights']
                 print("Copying weights...")
                 w_loc.append(copy.deepcopy(w))
                 print("Aggregating weights...")
                 w_glob = FedAvg(w_loc)
-                
-            # elif key == 'optimizer':
-            #     optimizer = checkpoint['optimizer']
-            # elif key == 'metric':
-            #     epochs = checkpoint['metric']
-            #     print("Best metric at Client: " + str(checkpoint['metric']) )
-            
+            elif k == "metric":
+                print("Best Metric at Client: " + str(checkpoint['metric']) )
             else:
                 print('Server does not recognized the sent data')
 
-        buffer = BytesIO()
-        checkpoint = {'epoch': epochs,
-            'weights': w_glob,
-            #'optimizer': optimizer
+    cpt = {#'epoch': 1, # to be determined
+            'weights': w_glob#,
+            #'metric': 0 # to be aggregated
             }
-        t.save(checkpoint, modelFile)
-
-        print("aggregation completed")
+    t.save(cpt, modelFile)
+    print(cpt)
+    time.sleep(10)
+    print("aggregation completed")
 
 def test_plan(client):
     # testing models on nodes

@@ -51,13 +51,13 @@ def instantiateMonaiAlgo(frac_val = 0.1, frac_test = 0.1):
     ma.to_onehot = AsDiscrete(to_onehot=True, n_classes=mo.num_class)
 
     train_ds = MedNISTDataset(train_x, train_y, train_transforms)
-    train_loader = t.utils.data.DataLoader(train_ds, batch_size=32, shuffle=True, num_workers=2)
+    train_loader = t.utils.data.DataLoader(train_ds, batch_size=128, shuffle=True, num_workers=2)
 
     val_ds = MedNISTDataset(val_x, val_y, val_transforms)
-    val_loader = t.utils.data.DataLoader(val_ds, batch_size=32, num_workers=2)
+    val_loader = t.utils.data.DataLoader(val_ds, batch_size=128, num_workers=2)
 
     test_ds = MedNISTDataset(test_x, test_y, val_transforms)
-    test_loader = t.utils.data.DataLoader(test_ds, batch_size=32, num_workers=2)
+    test_loader = t.utils.data.DataLoader(test_ds, batch_size=128, num_workers=2)
 
     # model initiliatization
     ma.model = densenet121(spatial_dims=2, in_channels=1, out_channels=mo.num_class)#.to(device)
