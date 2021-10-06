@@ -92,34 +92,5 @@ if __name__ == '__main__':
 
     with concurrent.futures.ProcessPoolExecutor() as executor:
         result = executor.map(stop_now, clients)  
-    logger.info("Done!")
+    logger.info(f"Done! Model Training is completed across all sites and current global model is available at following location...{modelFile}")
 
-
-
-#old aggregate function
-# def aggregate():
-#     for client in clients:
-#         logger.info(f"Aggregating with Node: {client.address}...") 
-#         checkpoint = client.gather()
-#         for k in checkpoint.keys():
-#             if k == "epoch":
-#                 #epochs = checkpoint['epoch']
-#                 logger.info(f"Best Epoch at Client: {checkpoint['epoch']}...") 
-#             elif k == "weights":
-#                 w = checkpoint['weights']
-#                 logger.info("Copying weights...")
-#                 w_loc.append(copy.deepcopy(w))
-#                 logger.info("Aggregating weights...")
-#                 w_glob = FedAvg(w_loc)
-#             elif k == "metric":
-#                 logger.info(f"Best Metric at Client: {checkpoint['metric']}..." )
-#             else:
-#                 logger.info('Server does not recognized the sent data')
-
-#     cpt = {#'epoch': 1, # to be determined
-#             'weights': w_glob#,
-#             #'metric': 0 # to be aggregated
-#             }
-#     t.save(cpt, modelFile)
-#     print(cpt.keys())
-#     logger.info("aggregation completed")

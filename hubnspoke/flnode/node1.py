@@ -1,4 +1,5 @@
 from pathlib import Path
+import threading
 cwd = str(Path.cwd())
 print(cwd)
 import os
@@ -35,7 +36,8 @@ request_data = Mapping()
 ma, class_names = instantiateMonaiAlgo(0.4, 0.5)
 
 class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
-            
+    def __init__(self, stop_event):
+        self._stop_event = stop_event
     
     def ModelTransfer(self, request, context):
         request_bytes = BytesIO(request.para_request)
@@ -114,28 +116,28 @@ class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
     def StopMessage(self, request, context):
         request_bytes = BytesIO(request.para_request)
         request_data = t.load(request_bytes, map_location='cpu')
-        logger.info('Received stop request')
-
+        logger.info('Received stop request')   
         logger.info("Sending stopping status to the Central Hub...")
         buffer = BytesIO()
         response_data = Mapping()
         response_data.update(reply="Stopping")
         t.save(response_data, buffer)
-
-        logger.info('Node stopping... (Not implemented yet)')   
+        logger.info('Node stopping...Thanks for using MONAI-FL...see you soon.')  
+        self._stop_event.set() 
         return ParamsResponse(para_response=buffer.getvalue())
 
 def serve():
+    stop_event = threading.Event()
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10),options=[
                ('grpc.max_send_message_length', 1000*1024*1024),
                ('grpc.max_receive_message_length', 1000*1024*1024)])
     monaifl_pb2_grpc.add_MonaiFLServiceServicer_to_server(
-        MonaiFLService(), server)
+        MonaiFLService(stop_event), server)
     server.add_insecure_port("[::]:50051")
     server.start()
     logger.info("Trainer is up and waiting for training configurations...")
-    server.wait_for_termination()
-    #print("server stopped")
+    stop_event.wait()
+    server.stop(5)
 
 if __name__ == "__main__":
     serve()
