@@ -26,7 +26,7 @@ modelName = "monai-test.pth.tar"
 modelFile = os.path.join(modelpath, modelName)
 w_loc = []
 request_data = Mapping()
-whitelist = ["localhost:50051", "localhost:5005"]
+whitelist = ["localhost:50051", "localhost:50052"]
 w_glob = list() 
 
 class Client():
@@ -129,7 +129,7 @@ class Client():
         
     
     def test(self):
-        self.data={"id":"server"} # useless
+        self.data={"test":"yes"} # useless
         buffer = BytesIO()
         t.save(self.data, buffer)
         size = buffer.getbuffer().nbytes
