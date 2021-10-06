@@ -61,6 +61,7 @@ class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
         logger.info(f"Local epochs to run: {request_data['epochs']}")
         # training and checkpoints
         logger.info("Starting training...")
+        ma.epochs = int(request_data['epochs'])
         checkpoint = Mapping()
         checkpoint = ma.train()
         logger.info("Saving trained local model...")

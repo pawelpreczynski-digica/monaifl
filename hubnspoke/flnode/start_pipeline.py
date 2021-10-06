@@ -69,7 +69,7 @@ def instantiateMonaiAlgo(frac_val = 0.1, frac_test = 0.1):
     ma.optimizer = t.optim.Adam(ma.model.parameters(), 1e-5)
 
     # number of epochs
-    ma.epochs = 1
+    #ma.epochs = 1
 
     # training/validation/testing datasets
     ma.train_ds = train_ds
