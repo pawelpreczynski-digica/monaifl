@@ -41,27 +41,27 @@ class Client():
     
 
     def bootstrap(self):
-        logger.info("Bootstrapping with fl node at " + self.address)
+        logger.info("bootstrapping with FL node at " + self.address)
         buffer = BytesIO()
         if self.address in whitelist:
             logger.info(self.address + " is whitelisted")
             if os.path.isfile(modelFile):
-                logger.info(f"Buffering the provided initial model {modelFile}...") 
+                logger.info(f"buffering the provided initial model {modelFile}...") 
                 checkpoint = t.load(modelFile)
                 t.save(checkpoint['weights'], buffer)
             else:
-                logger.info("The initial model does not exist, initializing and buffering a new one...")
+                logger.info("initial model does not exist, initializing and buffering a new one...")
                 t.save(self.model.state_dict(), buffer)
             size = buffer.getbuffer().nbytes
             
-            logger.info(f"Sending the initial model to {self.address}...")
+            logger.info(f"sending the initial model to {self.address}...")
             opts = [('grpc.max_receive_message_length', 1000*1024*1024), ('grpc.max_send_message_length', size*2), ('grpc.max_message_length', 1000*1024*1024)]
             self.channel = grpc.insecure_channel(self.address, options = opts)
             client = MonaiFLServiceStub(self.channel)
             fl_request = ParamsRequest(para_request=buffer.getvalue())
             fl_response = client.ModelTransfer(fl_request)
 
-            logger.info(f"Received the answer from {self.address}")
+            logger.info(f"received the answer from {self.address}")
             response_bytes = BytesIO(fl_response.para_response)
             response_data = t.load(response_bytes, map_location='cpu')
             logger.info(f"{self.address} returned status: {response_data}") # Model received OR Error
@@ -74,14 +74,14 @@ class Client():
         t.save(self.data, buffer)
         size = buffer.getbuffer().nbytes
 
-        logger.info(f"Sending the training request to {self.address} for {epochs} epochs...")
+        logger.info(f"sending the training request to {self.address} for {epochs} epochs...")
         opts = [('grpc.max_receive_message_length', 1000*1024*1024), ('grpc.max_send_message_length', size*2), ('grpc.max_message_length', 1000*1024*1024)]
         self.channel = grpc.insecure_channel(self.address, options = opts)
         client = MonaiFLServiceStub(self.channel)
         fl_request = ParamsRequest(para_request=buffer.getvalue())
         fl_response = client.MessageTransfer(fl_request)
 
-        logger.info(f"Received the training started ack from {self.address}")
+        logger.info(f"received the training started ack from {self.address}")
         response_bytes = BytesIO(fl_response.para_response)
         response_data = t.load(response_bytes, map_location='cpu')
         print(response_data)
@@ -94,18 +94,17 @@ class Client():
         t.save(self.data, buffer)
         size = buffer.getbuffer().nbytes
 
-        logger.info(f"Sending the training status request to {self.address}...")
+        logger.info(f"checking node status: {self.address}...")
         opts = [('grpc.max_receive_message_length', 1000*1024*1024), ('grpc.max_send_message_length', size*2), ('grpc.max_message_length', 1000*1024*1024)]
         self.channel = grpc.insecure_channel(self.address, options = opts)
         client = MonaiFLServiceStub(self.channel)
         fl_request = ParamsRequest(para_request=buffer.getvalue())
-        fl_response = client.TrainingStatus(fl_request)
+        fl_response = client.NodeStatus(fl_request)
 
-        logger.info(f"Received the training status from {self.address}")
+        logger.info(f"Node status: {self.address}")
         response_bytes = BytesIO(fl_response.para_response)
         response_data = t.load(response_bytes, map_location='cpu')
         logger.info(f"{self.address} returned status: {response_data}") # Training completed OR Training in progress 
-        print(response_data)
         return response_data
   
     def gather(self):
@@ -126,12 +125,10 @@ class Client():
         response_data = t.load(response_bytes, map_location='cpu')
         return response_data
         
-        
-    
     def test(self):
-        self.data={"test":"yes"} # useless
         buffer = BytesIO()
-        t.save(self.data, buffer)
+        checkpoint = t.load(modelFile)
+        t.save(checkpoint['weights'], buffer)
         size = buffer.getbuffer().nbytes
 
         logger.info(f"Sending the test request to {self.address}...")

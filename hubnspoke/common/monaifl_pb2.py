@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\rmonaifl.proto\x12\tprotobufs\"%\n\rParamsRequest\x12\x14\n\x0cpara_request\x18\x01 \x01(\x0c\"\'\n\x0eParamsResponse\x12\x15\n\rpara_response\x18\x02 \x01(\x0c\x32\xfb\x03\n\x0eMonaiFLService\x12\x44\n\rParamTransfer\x12\x18.protobufs.ParamsRequest\x1a\x19.protobufs.ParamsResponse\x12\x44\n\rModelTransfer\x12\x18.protobufs.ParamsRequest\x1a\x19.protobufs.ParamsResponse\x12\x45\n\x0eReportTransfer\x12\x18.protobufs.ParamsRequest\x1a\x19.protobufs.ParamsResponse\x12\x46\n\x0fMessageTransfer\x12\x18.protobufs.ParamsRequest\x1a\x19.protobufs.ParamsResponse\x12\x45\n\x0eTrainingStatus\x12\x18.protobufs.ParamsRequest\x1a\x19.protobufs.ParamsResponse\x12\x43\n\x0cTrainedModel\x12\x18.protobufs.ParamsRequest\x1a\x19.protobufs.ParamsResponse\x12\x42\n\x0bStopMessage\x12\x18.protobufs.ParamsRequest\x1a\x19.protobufs.ParamsResponseb\x06proto3'
+  serialized_pb=b'\n\rmonaifl.proto\x12\tprotobufs\"%\n\rParamsRequest\x12\x14\n\x0cpara_request\x18\x01 \x01(\x0c\"\'\n\x0eParamsResponse\x12\x15\n\rpara_response\x18\x02 \x01(\x0c\x32\xf7\x03\n\x0eMonaiFLService\x12\x44\n\rParamTransfer\x12\x18.protobufs.ParamsRequest\x1a\x19.protobufs.ParamsResponse\x12\x44\n\rModelTransfer\x12\x18.protobufs.ParamsRequest\x1a\x19.protobufs.ParamsResponse\x12\x45\n\x0eReportTransfer\x12\x18.protobufs.ParamsRequest\x1a\x19.protobufs.ParamsResponse\x12\x46\n\x0fMessageTransfer\x12\x18.protobufs.ParamsRequest\x1a\x19.protobufs.ParamsResponse\x12\x41\n\nNodeStatus\x12\x18.protobufs.ParamsRequest\x1a\x19.protobufs.ParamsResponse\x12\x43\n\x0cTrainedModel\x12\x18.protobufs.ParamsRequest\x1a\x19.protobufs.ParamsResponse\x12\x42\n\x0bStopMessage\x12\x18.protobufs.ParamsRequest\x1a\x19.protobufs.ParamsResponseb\x06proto3'
 )
 
 
@@ -116,7 +116,7 @@ _MONAIFLSERVICE = _descriptor.ServiceDescriptor(
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
   serialized_start=109,
-  serialized_end=616,
+  serialized_end=612,
   methods=[
   _descriptor.MethodDescriptor(
     name='ParamTransfer',
@@ -159,8 +159,8 @@ _MONAIFLSERVICE = _descriptor.ServiceDescriptor(
     create_key=_descriptor._internal_create_key,
   ),
   _descriptor.MethodDescriptor(
-    name='TrainingStatus',
-    full_name='protobufs.MonaiFLService.TrainingStatus',
+    name='NodeStatus',
+    full_name='protobufs.MonaiFLService.NodeStatus',
     index=4,
     containing_service=None,
     input_type=_PARAMSREQUEST,

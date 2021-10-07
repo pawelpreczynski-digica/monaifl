@@ -6,7 +6,6 @@ import os
 import sys
 sys.path.append('.')
 
-import asyncio
 from concurrent import futures
 from io import BytesIO
 import grpc
@@ -14,8 +13,6 @@ from common import monaifl_pb2_grpc as monaifl_pb2_grpc
 from common.monaifl_pb2 import ParamsResponse
 from common.utils import Mapping
 import torch as t
-import copy
-import subprocess
 from flnode.start_pipeline import instantiateMonaiAlgo
 import logging
 logging.basicConfig(format='%(asctime)s - %(message)s')
@@ -44,14 +41,14 @@ class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
         request_data = t.load(request_bytes, map_location='cpu')
         t.save(request_data, headModelFile)
         if os.path.isfile(headModelFile):
-            request_data.update(reply="Model received")
-            logger.info(f"Global model saved at: {headModelFile}")
+            request_data.update(reply="model received")
+            logger.info(f"global model saved at: {headModelFile}")
             logger.info("FL node is ready for training and waiting for training configurations")
         else:
-            request_data.update(reply="Error while receiving the model")
+            request_data.update(reply="error while receiving the model")
             logger.error("FL node is not ready for training")
         
-        logger.info("Returning answer to the Central Hub...")
+        logger.info("returning answer to the central Hub...")
         buffer = BytesIO()
         t.save(request_data['reply'], buffer)
         return ParamsResponse(para_response=buffer.getvalue())
@@ -59,35 +56,29 @@ class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
     def MessageTransfer(self, request, context):
         request_bytes = BytesIO(request.para_request)
         request_data = t.load(request_bytes, map_location='cpu')
-        logger.info('Received training configurations')
-        logger.info(f"Local epochs to run: {request_data['epochs']}")
+        logger.info('received training configurations')
+        logger.info(f"local epochs to run: {request_data['epochs']}")
         # training and checkpoints
-        logger.info("Starting training...")
+        logger.info("starting training...")
         ma.epochs = int(request_data['epochs'])
         checkpoint = Mapping()
         checkpoint = ma.train()
-        logger.info("Saving trained local model...")
+        logger.info("saving trained local model...")
         t.save(checkpoint, trunkModelFile)
-        logger.info(f"Local model saved at: {trunkModelFile}")
-        logger.info("Sending training completed message to the the Central Hub...")
+        logger.info(f"local model saved at: {trunkModelFile}")
+        logger.info("sending training completed message to the the Central Hub...")
         buffer = BytesIO()
-        request_data.update(reply="Training started")
+        request_data.update(reply="training started")
         t.save(request_data['reply'], buffer)
         return ParamsResponse(para_response=buffer.getvalue())
     
-    def TrainingStatus(self, request, context):
-        logger.info("Received the training status request")
-        request_bytes = BytesIO(request.para_request)
-        request_data = t.load(request_bytes, map_location='cpu')
+    def NodeStatus(self, request, context):
+        logger.info("received status request")
+                
+        request_data.update(reply="alive")
+        logger.info("node status: alive")
         
-        if os.path.isfile(trunkModelFile):
-            request_data.update(reply="Training completed")
-            logger.info("Training status: completed")
-        else:
-            request_data.update(reply="Training in progress")
-            logger.info("Training status: in progress")
-
-        logger.info("Sending training status to the Central Hub...")
+        logger.info("sending node status to the central hub...")
         buffer = BytesIO()
         t.save(request_data['reply'], buffer)
         return ParamsResponse(para_response=buffer.getvalue())
@@ -95,20 +86,28 @@ class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
     def TrainedModel(self, request, context):
         buffer = BytesIO()
         if os.path.isfile(trunkModelFile):
-                logger.info(f"sending trained model {trunkModelFile} to the Central Hub...") 
+                logger.info(f"sending trained model {trunkModelFile} to the central Hub...") 
                 checkpoint = t.load(trunkModelFile)
                 t.save(checkpoint, buffer)
+
         return ParamsResponse(para_response=buffer.getvalue())
     
     def ReportTransfer(self, request, context):
         request_bytes = BytesIO(request.para_request)
         request_data = t.load(request_bytes, map_location='cpu')
-        logger.info('Received test request')
+        t.save(request_data, headModelFile)
+        if os.path.isfile(headModelFile):
+            request_data.update(reply="model received for testing")
+            logger.info(f"global model saved at: {headModelFile}")
+        else:
+            request_data.update(reply="error while receiving the model")
+
+        logger.info('received test request')
 
         response_data = Mapping()
         response_data = ma.predict(class_names, headModelFile)
 
-        logger.info("Sending test report to the Central Hub...")       
+        logger.info("sending test report to the Central Hub...")       
         buffer = BytesIO()
         t.save(response_data['report'], buffer)
         return ParamsResponse(para_response=buffer.getvalue())
@@ -116,13 +115,13 @@ class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
     def StopMessage(self, request, context):
         request_bytes = BytesIO(request.para_request)
         request_data = t.load(request_bytes, map_location='cpu')
-        logger.info('Received stop request')   
-        logger.info("Sending stopping status to the Central Hub...")
+        logger.info('received stop request')   
+        logger.info("sending stopping status to the Central Hub...")
         buffer = BytesIO()
         response_data = Mapping()
-        response_data.update(reply="Stopping")
+        response_data.update(reply="stopping")
         t.save(response_data, buffer)
-        logger.info('Node stopping...Thanks for using MONAI-FL...see you soon.')  
+        logger.info('node stopping...thanks for using MONAI-FL...see you soon.')  
         self._stop_event.set() 
         return ParamsResponse(para_response=buffer.getvalue())
 
@@ -135,7 +134,7 @@ def serve():
         MonaiFLService(stop_event), server)
     server.add_insecure_port("[::]:50051")
     server.start()
-    logger.info("Trainer is up and waiting for training configurations...")
+    logger.info("FL node is up and waiting for training configurations...")
     stop_event.wait()
     server.stop(5)
 

@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-from common import monaifl_pb2 as monaifl__pb2
+import common.monaifl_pb2 as monaifl__pb2
 
 
 class MonaiFLServiceStub(object):
@@ -35,8 +35,8 @@ class MonaiFLServiceStub(object):
                 request_serializer=monaifl__pb2.ParamsRequest.SerializeToString,
                 response_deserializer=monaifl__pb2.ParamsResponse.FromString,
                 )
-        self.TrainingStatus = channel.unary_unary(
-                '/protobufs.MonaiFLService/TrainingStatus',
+        self.NodeStatus = channel.unary_unary(
+                '/protobufs.MonaiFLService/NodeStatus',
                 request_serializer=monaifl__pb2.ParamsRequest.SerializeToString,
                 response_deserializer=monaifl__pb2.ParamsResponse.FromString,
                 )
@@ -80,7 +80,7 @@ class MonaiFLServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def TrainingStatus(self, request, context):
+    def NodeStatus(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -121,8 +121,8 @@ def add_MonaiFLServiceServicer_to_server(servicer, server):
                     request_deserializer=monaifl__pb2.ParamsRequest.FromString,
                     response_serializer=monaifl__pb2.ParamsResponse.SerializeToString,
             ),
-            'TrainingStatus': grpc.unary_unary_rpc_method_handler(
-                    servicer.TrainingStatus,
+            'NodeStatus': grpc.unary_unary_rpc_method_handler(
+                    servicer.NodeStatus,
                     request_deserializer=monaifl__pb2.ParamsRequest.FromString,
                     response_serializer=monaifl__pb2.ParamsResponse.SerializeToString,
             ),
@@ -216,7 +216,7 @@ class MonaiFLService(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def TrainingStatus(request,
+    def NodeStatus(request,
             target,
             options=(),
             channel_credentials=None,
@@ -226,7 +226,7 @@ class MonaiFLService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/protobufs.MonaiFLService/TrainingStatus',
+        return grpc.experimental.unary_unary(request, target, '/protobufs.MonaiFLService/NodeStatus',
             monaifl__pb2.ParamsRequest.SerializeToString,
             monaifl__pb2.ParamsResponse.FromString,
             options, channel_credentials,
