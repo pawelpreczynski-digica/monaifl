@@ -24,14 +24,16 @@ modelpath = os.path.join(cwd, "save","models","hub")
 modelName = "monai-test.pth.tar"
 
 modelFile = os.path.join(modelpath, modelName)
-w_loc = []
-request_data = Mapping()
-whitelist = ["localhost:50051", "localhost:50052"]
+w_loc = list() 
 w_glob = list() 
+request_data = Mapping()
+whitelist = set()
+
 
 class Client():
     def __init__(self, address):
         self.address = address
+        whitelist.add(address)
         self.client = None
         self.data = None
         self.model = None
