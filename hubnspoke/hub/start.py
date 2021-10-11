@@ -20,7 +20,7 @@ from botocore.exceptions import ClientError
 
 logging.basicConfig(format='%(asctime)s - %(message)s')
 logger = logging.getLogger()
-logger.setLevel(logging.NOTSET)
+logger.setLevel(logging.INFO)
 
 FL_CLIENT_ENDPOINTS = json.loads(os.environ.get('FL_CLIENT_ENDPOINTS'))
 ENVIRONMENT = os.environ.get('ENVIRONMENT')
@@ -102,10 +102,10 @@ def upload_results_in_s3_bucket(source_path: str, bucket_name: str = 'flip-uploa
     shutil.make_archive(zip_path, 'zip', source_path)
 
     logger.info(f'Uploading zip file {zip_path} to S3 bucket {bucket_name} in folder {MODEL_ID}...')
-    bucket_zip_path = MODEL_ID + '/' + zip_name + '.zip'
+    bucket_zip_path = MODEL_ID + '/' + zip_name
     s3_client = boto3.client('s3')
     try:
-        s3_client.upload_file(zip_path, bucket_name, bucket_zip_path)
+        s3_client.upload_file(zip_path + '.zip', bucket_name, bucket_zip_path + '.zip')
     except ClientError as e:
         logger.error(e)
 
@@ -138,6 +138,6 @@ if __name__ == '__main__':
     # all processes are excuted 
     logger.info(f"Model Training is completed across all sites and current global model is available at following location...{modelFile}")
 
-    # upload_results_in_s3_bucket(modelpath)
+    upload_results_in_s3_bucket(modelpath)
 
-    # logger.info("Centra Hub FL Server terminated")
+    logger.info("Centra Hub FL Server terminated")
