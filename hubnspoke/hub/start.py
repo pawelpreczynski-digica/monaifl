@@ -14,6 +14,7 @@ import torch as t
 from coordinator import FedAvg
 import shutil
 from datetime import datetime
+import json
 import boto3
 from botocore.exceptions import ClientError
 
@@ -21,7 +22,7 @@ logging.basicConfig(format='%(asctime)s - %(message)s')
 logger = logging.getLogger()
 logger.setLevel(logging.NOTSET)
 
-
+FL_CLIENT_ENDPOINTS = json.loads(os.environ.get('FL_CLIENT_ENDPOINTS'))
 ENVIRONMENT = os.environ.get('ENVIRONMENT')
 MODEL_ID = os.environ.get('MODEL_ID')
 
@@ -30,12 +31,7 @@ modelName = "monai-test.pth.tar"
 
 modelFile = os.path.join(modelpath, modelName)
 w_loc = []
-
-nodes ={  1: {'address': 'localhost:50051'},
-          2: {'address': 'localhost:50052'},
-       }
-
-clients = (Client(nodes[1]['address']), Client(nodes[2]['address']))
+clients = [Client(address) for address in FL_CLIENT_ENDPOINTS]
 
 def model_spread_plan(client):
     try:
@@ -142,6 +138,6 @@ if __name__ == '__main__':
     # all processes are excuted 
     logger.info(f"Model Training is completed across all sites and current global model is available at following location...{modelFile}")
 
-    upload_results_in_s3_bucket(modelpath)
+    # upload_results_in_s3_bucket(modelpath)
 
-    logger.info("Centra Hub FL Server terminated")
+    # logger.info("Centra Hub FL Server terminated")
