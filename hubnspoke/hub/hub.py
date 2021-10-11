@@ -143,7 +143,12 @@ class Client():
         logger.info(f"Received the test report from {self.address}")
         response_bytes = BytesIO(fl_response.para_response)    
         response_data = t.load(response_bytes, map_location='cpu')
-        print(response_data)
+
+        reportName = self.address.replace('.','-').replace(':','_') + '.txt'
+        reportFile = os.path.join(modelpath, reportName)
+        logger.info(f"Writing the test report from {self.address} in {reportFile}...")
+        with open(reportFile, 'w') as f:
+            f.write(response_data)
     
     def stop(self):
         self.data={"stop":"yes"} # useless
