@@ -10,11 +10,20 @@ import logging
 import concurrent.futures
 import copy
 import time
+import torch as t
+from coordinator import FedAvg
+import shutil
+from datetime import datetime
+import boto3
+from botocore.exceptions import ClientError
+
 logging.basicConfig(format='%(asctime)s - %(message)s')
 logger = logging.getLogger()
 logger.setLevel(logging.NOTSET)
-import torch as t
-from coordinator import FedAvg
+
+
+ENVIRONMENT = os.environ.get('ENVIRONMENT')
+MODEL_ID = os.environ.get('MODEL_ID')
 
 modelpath = os.path.join(cwd, "save","models","hub")
 modelName = "monai-test.pth.tar"
@@ -87,7 +96,22 @@ def stop_now(client):
             client.stop()
     except:
         logger.info(f"client {client.address} is dead...")
+
+def upload_results_in_s3_bucket(source_path: str, bucket_name: str = 'flip-uploaded-federated-data-bucket'):
+    bucket_name += '-' + ENVIRONMENT
     
+    logger.info('Zipping the final model and the test reports...')
+    zip_name = datetime.now().strftime("%Y%m%d_%H%M%S")
+    zip_path = os.path.join(cwd, "save", zip_name)
+    shutil.make_archive(zip_path, 'zip', source_path)
+
+    logger.info(f'Uploading zip file {zip_path} to S3 bucket {bucket_name} in folder {MODEL_ID}...')
+    bucket_zip_path = MODEL_ID + '/' + zip_name + '.zip'
+    s3_client = boto3.client('s3')
+    try:
+        s3_client.upload_file(zip_path, bucket_name, bucket_zip_path)
+    except ClientError as e:
+        logger.error(e)
 
 
 if __name__ == '__main__':
@@ -116,5 +140,8 @@ if __name__ == '__main__':
         result = executor.map(stop_now, clients)  
     
     # all processes are excuted 
-    logger.info(f"Done! Model Training is completed across all sites and current global model is available at following location...{modelFile}")
+    logger.info(f"Model Training is completed across all sites and current global model is available at following location...{modelFile}")
 
+    upload_results_in_s3_bucket(modelpath)
+
+    logger.info("Centra Hub FL Server terminated")
