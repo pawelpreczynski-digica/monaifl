@@ -17,7 +17,7 @@ import copy
 import logging
 logging.basicConfig(format='%(asctime)s - %(message)s')
 logger = logging.getLogger()
-logger.setLevel(logging.NOTSET)
+logger.setLevel(logging.INFO)
 
 
 modelpath = os.path.join(cwd, "save","models","hub")
