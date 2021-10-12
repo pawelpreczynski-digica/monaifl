@@ -16,7 +16,6 @@ import shutil
 from datetime import datetime
 import json
 import boto3
-from botocore.exceptions import ClientError
 
 logging.basicConfig(format='%(asctime)s - %(message)s')
 logger = logging.getLogger()
@@ -106,8 +105,10 @@ def upload_results_in_s3_bucket(source_path: str, bucket_name: str = 'flip-uploa
     s3_client = boto3.client('s3')
     try:
         s3_client.upload_file(zip_path + '.zip', bucket_name, bucket_zip_path + '.zip')
-    except ClientError as e:
+    except Exception as e:
         logger.error(e)
+
+    logger.info('Upload completed!')
 
 
 if __name__ == '__main__':
