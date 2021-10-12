@@ -15,7 +15,7 @@ from common.utils import Mapping
 import torch as t
 from flnode.start_pipeline import instantiateMonaiAlgo
 import logging
-logging.basicConfig(format='%(asctime)s - %(message)s')
+logging.basicConfig(format='[%(asctime)s]-%(message)s')
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
