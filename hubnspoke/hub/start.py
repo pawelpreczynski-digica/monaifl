@@ -30,7 +30,7 @@ modelName = "monai-test.pth.tar"
 
 modelFile = os.path.join(modelpath, modelName)
 w_loc = []
-clients = [Client(address) for address in FL_CLIENT_ENDPOINTS]
+clients = [Client(fl_client['flclientendpoint'], fl_client['name']) for fl_client in FL_CLIENT_ENDPOINTS]
 
 def model_spread_plan(client):
     try:
