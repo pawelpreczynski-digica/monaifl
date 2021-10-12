@@ -17,7 +17,7 @@ from flnode.start_pipeline import instantiateMonaiAlgo
 import logging
 logging.basicConfig(format='%(asctime)s - %(message)s')
 logger = logging.getLogger()
-logger.setLevel(logging.NOTSET)
+logger.setLevel(logging.INFO)
 
 
 modelName = "monai-test.pth.tar"
@@ -30,7 +30,7 @@ trunkModelFile = os.path.join(trunkmodelpath, modelName)
 
 w_loc = []
 request_data = Mapping()
-ma, class_names = instantiateMonaiAlgo(0.4, 0.5)
+ma, class_names = instantiateMonaiAlgo(0.49, 0.5)
 
 class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
     def __init__(self, stop_event):
