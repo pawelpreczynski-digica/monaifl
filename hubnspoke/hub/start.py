@@ -19,6 +19,7 @@ MODEL_ID = os.environ.get('MODEL_ID')
 modelpath = os.path.join(cwd, "save","models","hub")
 modelName = "monai-test.pth.tar"
 modelFile = os.path.join(modelpath, modelName)
+w_loc = list() 
 
 federated_process_logger = logging.getLogger('federated_process')
 syslog = logging.StreamHandler()
@@ -48,45 +49,24 @@ logger.setLevel(logging.INFO)
 
 
 def model_spread_plan(client):
-    try:
-        if(client.status() == "alive"):
-            # spreading model to nodes
-            client.bootstrap()
-    except:
-        logger.info(f"client {client.name} is dead...")
+    # spreading model to nodes
+    client.bootstrap()
 
 def train_plan(client):
-    try:
-        if(client.status() == "alive"):
-            # initializing training on nodes
-            client.train(epochs='1')
-    except:
-        logger.info(f"client {client.name} is dead...")
+    # initializing training on nodes
+    client.train(epochs='1')
     
-def aggregate(client):
-    try:
-        if(client.status() == "alive"):
-            # aggregating models from nodes
-            client.aggregate()
-    except Exception as ex:
-        print(ex)
-        logger.info(f"client {client.name} is dead...")
+def aggregate_plan(client):
+    # aggregating models from nodes
+    client.aggregate(w_loc)
 
 def test_plan(client):
-    try:
-        if(client.status() == "alive"):
-            # testing models on nodes
-            client.test()
-    except:
-        logger.info(f"client {client.name} is dead...")
+    # testing models on nodes
+    client.test()
     
 def stop_now(client):
-    try:
-        if(client.status() == "alive"):
-            # asking nodes to stop
-            client.stop()
-    except:
-        logger.info(f"client {client.name} is dead...")
+    # asking nodes to stop
+    client.stop()
 
 def upload_results_in_s3_bucket(source_path: str, bucket_name: str = 'flip-uploaded-federated-data-bucket'):
     bucket_name += '-' + ENVIRONMENT
@@ -122,7 +102,7 @@ if __name__ == '__main__':
             result = executor.map(train_plan, clients)    
 
         with concurrent.futures.ProcessPoolExecutor() as executor:
-            result = executor.map(aggregate, clients)   
+            result = executor.map(aggregate_plan, clients)   
 
         with concurrent.futures.ProcessPoolExecutor() as executor:
             result = executor.map(test_plan, clients)    
