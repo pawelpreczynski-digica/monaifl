@@ -68,7 +68,7 @@ class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
         logger.info(f"local model saved at: {trunkModelFile}")
         logger.info("sending training completed message to the the Central Hub...")
         buffer = BytesIO()
-        request_data.update(reply="training finished")
+        request_data.update(reply="training completed")
         t.save(request_data['reply'], buffer)
         return ParamsResponse(para_response=buffer.getvalue())
     
