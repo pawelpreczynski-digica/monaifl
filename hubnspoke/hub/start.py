@@ -21,31 +21,15 @@ modelName = "monai-test.pth.tar"
 modelFile = os.path.join(modelpath, modelName)
 w_loc = list() 
 
-federated_process_logger = logging.getLogger('federated_process')
-syslog = logging.StreamHandler()
-formatter = logging.Formatter('[%(asctime)s]-[%(model_id)s]-[%(status)s]-[%(trust_name)s]-%(message)s')
-syslog.setFormatter(formatter)
-federated_process_logger.setLevel(logging.INFO)
-federated_process_logger.addHandler(syslog)
-
-node_status_logger = logging.getLogger('node_status')
-syslog = logging.StreamHandler()
-formatter = logging.Formatter('[%(asctime)s]-[%(model_id)s]-[%(trust_name)s]-%(message)s')
-syslog.setFormatter(formatter)
-node_status_logger.setLevel(logging.INFO)
-node_status_logger.addHandler(syslog)
-
 main_logger = logging.getLogger('main')
 syslog = logging.StreamHandler()
 formatter = logging.Formatter('[%(asctime)s]-[%(model_id)s]-[%(status)s]-%(message)s')
 syslog.setFormatter(formatter)
 main_logger.setLevel(logging.INFO)
 main_logger.addHandler(syslog)
-main_logger = logging.LoggerAdapter(main_logger, extra={'model_id': MODEL_ID})
 
-logging.basicConfig(format='%(asctime)s - %(message)s')
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+main_logger_extra = {'model_id': MODEL_ID, 'status': ''}
+main_logger = logging.LoggerAdapter(main_logger, extra=main_logger_extra)
 
 
 def model_spread_plan(client):
@@ -69,26 +53,32 @@ def stop_now(client):
     client.stop()
 
 def upload_results_in_s3_bucket(source_path: str, bucket_name: str = 'flip-uploaded-federated-data-bucket'):
+    global main_logger
+    main_logger_extra['status'] = Stage.UPLOAD_STARTED
+
     bucket_name += '-' + ENVIRONMENT
     
-    logger.info('Zipping the final model and the test reports...')
+    main_logger.info('zipping the final model and the test reports...')
     zip_name = datetime.now().strftime("%Y%m%d_%H%M%S")
     zip_path = os.path.join(cwd, "save", zip_name)
     shutil.make_archive(zip_path, 'zip', source_path)
 
-    logger.info(f'Uploading zip file {zip_path} to S3 bucket {bucket_name} in folder {MODEL_ID}...')
+    main_logger.info(f'uploading zip file {zip_path} to S3 bucket {bucket_name} in folder {MODEL_ID}...')
     bucket_zip_path = MODEL_ID + '/' + zip_name
     s3_client = boto3.client('s3')
     try:
         s3_client.upload_file(zip_path + '.zip', bucket_name, bucket_zip_path + '.zip')
     except Exception as e:
-        logger.error(e)
+        main_logger.error(e)
 
-    logger.info('Upload completed!')
+    main_logger_extra['status'] = Stage.UPLOAD_COMPLETED
+    main_logger.info('upload completed')
 
 
 if __name__ == '__main__':
-    logger.info("hub started")
+    main_logger_extra['status'] = Stage.FEDERATION_INITIALIZATION_STARTED
+
+    main_logger.info("fl hub started")
     clients = [Client(fl_client['flclientendpoint'], fl_client['name']) for fl_client in FL_CLIENT_ENDPOINTS]
 
     global_round = 1
@@ -96,25 +86,38 @@ if __name__ == '__main__':
     for round in range(global_round):
         if (round==0):
             with concurrent.futures.ProcessPoolExecutor() as executor:
-                result = executor.map(model_spread_plan, clients)    
+                result = executor.map(model_spread_plan, clients)
+            
+            main_logger_extra['status'] = Stage.FEDERATION_INITIALIZATION_COMPLETED
+            main_logger.info("initial model shared with all fl nodes")
+
 
         with concurrent.futures.ProcessPoolExecutor() as executor:
-            result = executor.map(train_plan, clients)    
+            result = executor.map(train_plan, clients)
+
+        main_logger_extra['status'] = Stage.TRAINING_COMPLETED
+        main_logger.info("model training completed for all fl nodes")    
 
         with concurrent.futures.ProcessPoolExecutor() as executor:
-            result = executor.map(aggregate_plan, clients)   
+            result = executor.map(aggregate_plan, clients)
+
+        main_logger_extra['status'] = Stage.AGGREGATION_COMPLETED
+        main_logger.info("aggregation completed for all fl nodes models")    
 
         with concurrent.futures.ProcessPoolExecutor() as executor:
             result = executor.map(test_plan, clients)    
         
-        logger.info(f"Global round {round+1}/{global_round} completed")
+        main_logger_extra['status'] = Stage.TESTING_COMPLETED
+        main_logger.info("global model tested in all fl nodes")
+        main_logger.info(f"global round {round+1}/{global_round} completed")
 
     with concurrent.futures.ProcessPoolExecutor() as executor:
         result = executor.map(stop_now, clients)  
     
-    # all processes are excuted 
-    logger.info(f"Model Training is completed across all sites and current global model is available at {modelFile}")
+    # all processes are excuted
+    main_logger_extra['status'] = Stage.FEDERATION_COMPLETED
+    main_logger.info(f"model training is completed across all sites and current global model is available at {modelFile}")
 
     upload_results_in_s3_bucket(modelpath)
 
-    logger.info("Centra Hub FL Server terminated")
+    main_logger.info("fl hub terminated")
