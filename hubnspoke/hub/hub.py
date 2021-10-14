@@ -28,6 +28,7 @@ class Stage():
     FEDERATION_COMPLETED = 'FEDERATION_COMPLETED'
     UPLOAD_STARTED = 'UPLOAD_STARTED'
     UPLOAD_COMPLETED = 'UPLOAD_COMPLETED'
+    UPLOAD_FAILED = 'UPLOAD_FAILED'
 
 
 modelpath = os.path.join(cwd, "save","models","hub")

@@ -68,11 +68,11 @@ def upload_results_in_s3_bucket(source_path: str, bucket_name: str = 'flip-uploa
     s3_client = boto3.client('s3')
     try:
         s3_client.upload_file(zip_path + '.zip', bucket_name, bucket_zip_path + '.zip')
+        main_logger_extra['status'] = Stage.UPLOAD_COMPLETED
+        main_logger.info('upload completed')
     except Exception as e:
+        main_logger_extra['status'] = Stage.UPLOAD_FAILED
         main_logger.error(e)
-
-    main_logger_extra['status'] = Stage.UPLOAD_COMPLETED
-    main_logger.info('upload completed')
 
 
 if __name__ == '__main__':
