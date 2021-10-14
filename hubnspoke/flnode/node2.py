@@ -15,7 +15,7 @@ from common.utils import Mapping
 import torch as t
 from flnode.start_pipeline import instantiateMonaiAlgo
 import logging
-logging.basicConfig(format='%(asctime)s - %(message)s')
+logging.basicConfig(format='[%(asctime)s]-%(message)s')
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
@@ -68,7 +68,7 @@ class MonaiFLService(monaifl_pb2_grpc.MonaiFLServiceServicer):
         logger.info(f"local model saved at: {trunkModelFile}")
         logger.info("sending training completed message to the the Central Hub...")
         buffer = BytesIO()
-        request_data.update(reply="training started")
+        request_data.update(reply="training completed")
         t.save(request_data['reply'], buffer)
         return ParamsResponse(para_response=buffer.getvalue())
     
